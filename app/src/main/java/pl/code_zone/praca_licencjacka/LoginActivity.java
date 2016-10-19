@@ -34,10 +34,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import pl.code_zone.praca_licencjacka.model.User;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
+import pl.code_zone.praca_licencjacka.utils.RsaUtils;
 import pl.code_zone.praca_licencjacka.webservice.UserService;
+import pl.code_zone.praca_licencjacka.webservice.credentials.EmailPassCred;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -215,17 +218,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 .build();
 
         UserService service = retrofit.create(UserService.class);
-        Call<User> userCall = service.getUserByEmailAndPassword(email, password);
-        userCall.enqueue(new Callback<User>() {
+        EmailPassCred cred = new EmailPassCred();
+        cred.setEmail(email);
+        cred.setPassword(RsaUtils.encrypt(password));
+        Call<String> userCall = service.getUserByEmailAndPassword(cred);
+        userCall.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(Call<String> call, Response<String> response) {
                 showProgress(false);
 
                 if (response.isSuccessful()) {
-                    User user = response.body();
-                    Log.d(TAG, "Username: " + user.getName());
-                    Log.d(TAG, "Email: " + user.getEmail());
-                    Log.d(TAG, "Profile: " + user.getProfile().getId() + " " + user.getProfile().getName());
+                    Log.d(TAG, "Token: " + response.body());
 
                     changeActivity();
                 }
@@ -242,7 +245,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<String> call, Throwable t) {
                 showProgress(false);
 
                 Log.e(TAG, t.toString());
