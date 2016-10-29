@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -23,11 +24,18 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -35,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import pl.code_zone.praca_licencjacka.model.User;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.RsaUtils;
@@ -62,13 +69,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world",
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
@@ -79,11 +79,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private TextView mErrorView;
     private View mProgressView;
     private View mLoginFormView;
+    private ImageView mLogoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        mLogoView = (ImageView) findViewById(R.id.logo);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -110,8 +113,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
+        mEmailSignUpButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptRegister();
+            }
+        });
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+    private void attemptRegister() {
+        changeActivity(RegisterActivity.class);
     }
 
     private void populateAutoComplete() {
@@ -230,7 +245,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Token: " + response.body());
 
-                    changeActivity();
+                    changeActivity(MainActivity.class);
                 }
                 else {
                     try {
@@ -253,9 +268,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
     }
 
-    private void changeActivity() {
-        ActivityUtils.change(LoginActivity.this, MainActivity.class);
+    private void changeActivity(Class clazz) {
+        ActivityUtils.change(LoginActivity.this, clazz);
         finish();
+        runFadeAnimation();
+    }
+
+    private void runFadeAnimation() {
+        Animation popin = AnimationUtils.loadAnimation(this, R.anim.popin);
+        popin.reset();
+        Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
+        fadein.reset();
+
+        LinearLayout ll = (LinearLayout) findViewById(R.id.email_login_form);
+        ll.clearAnimation();
+
+        AnimationSet animationSet = new AnimationSet(true);
+        animationSet.addAnimation(popin);
+        animationSet.addAnimation(fadein);
+
+
+        ll.startAnimation(animationSet);
     }
 
     private boolean isEmailValid(String email) {
@@ -415,6 +448,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+
+    private class MyAnimationListener implements Animation.AnimationListener {
+        @Override
+        public void onAnimationStart(Animation animation) {
+            mLogoView.clearAnimation();
+            AppBarLayout.LayoutParams lp = new AppBarLayout.LayoutParams(mLogoView.getWidth(), mLogoView.getHeight());
+            lp.setMargins(0, 100, 0, 0);
+            mLogoView.setLayoutParams(lp);
+        }
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+
         }
     }
 }

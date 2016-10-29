@@ -23,4 +23,7 @@ public interface UserService {
     @POST("user/login")
     Call<String> getUserByEmailAndPassword(@Body EmailPassCred emailPassCred);
 
+    @POST("user/register")
+    Call<String> registerNewUser(@Body User user);
+
 }

@@ -26,6 +26,8 @@ public class User {
     Timestamp dateCreation;
     @SerializedName("dateUpdated")
     Timestamp dateUpdated;
+    @SerializedName("dateDeleted")
+    Timestamp dateDeleted;
     @SerializedName("userImage")
     String userImage;
 
@@ -93,7 +95,12 @@ public class User {
         this.name = name;
     }
 
-    @SerializedName("dateDeleted")
-    Timestamp dateDeleted;
+    public String getUserImage() {
+        return userImage;
+    }
+
+    public void setUserImage(String userImage) {
+        this.userImage = userImage;
+    }
 
 }
