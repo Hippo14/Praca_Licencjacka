@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 
 import pl.code_zone.praca_licencjacka.model.Profile;
 import pl.code_zone.praca_licencjacka.model.User;
@@ -124,6 +125,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
 
     private void changeActivity(Class clazz) {
         ActivityUtils.change(RegisterActivity.this, clazz);
+        finish();
+    }
+
+    private void changeActivity(Class clazz, HashMap<String, String> hashMap) {
+        ActivityUtils.change(RegisterActivity.this, clazz,  hashMap);
         finish();
     }
 
@@ -230,7 +236,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Token: " + response.body());
 
-                    changeActivity(MainActivity.class);
+                    HashMap<String, String> hashMap = new HashMap<>();
+                    hashMap.put("token", response.body());
+
+                    changeActivity(MainActivity.class, hashMap);
                 }
                 else {
                     try {

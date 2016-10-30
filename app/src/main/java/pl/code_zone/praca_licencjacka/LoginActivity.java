@@ -40,6 +40,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -245,7 +246,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Token: " + response.body());
 
-                    changeActivity(MainActivity.class);
+                    HashMap<String, String> hashMap = new HashMap<>();
+                    hashMap.put("token", response.body());
+
+                    changeActivity(MainActivity.class, hashMap);
                 }
                 else {
                     try {
@@ -273,6 +277,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         finish();
     }
 
+    private void changeActivity(Class clazz, HashMap<String, String> hashMap) {
+        ActivityUtils.change(LoginActivity.this, clazz,  hashMap);
+        finish();
+    }
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.contains("@");

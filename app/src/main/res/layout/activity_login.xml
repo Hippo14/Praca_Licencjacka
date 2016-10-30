@@ -12,13 +12,13 @@
     android:background="@drawable/background_color"
     tools:context="pl.code_zone.praca_licencjacka.LoginActivity">
 
-    <!-- Login progress -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/partyhub"
         android:id="@+id/logo" />
 
+    <!-- Login progress -->
     <ProgressBar
         android:id="@+id/login_progress"
         style="?android:attr/progressBarStyleLarge"
