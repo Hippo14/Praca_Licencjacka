@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -22,18 +23,22 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.sql.Timestamp;
+import java.io.IOException;
 import java.util.Date;
 
+import pl.code_zone.praca_licencjacka.model.Profile;
 import pl.code_zone.praca_licencjacka.model.User;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
+import pl.code_zone.praca_licencjacka.utils.RsaUtils;
 import pl.code_zone.praca_licencjacka.webservice.UserService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import static android.R.attr.id;
 
 public class RegisterActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -47,6 +52,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     //private UserRegisterTask mAuthTask = null;
 
     // UI Reference
+    private EditText mNameView;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private TextView mErrorView;
@@ -58,6 +64,8 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         // Set up the register form
+        mNameView = (EditText) findViewById(R.id.name);
+
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
@@ -125,10 +133,12 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
 //        }
 
         // Reset errors.
+        mNameView.setError(null);
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the register attempt.
+        String name = mNameView.getText().toString();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -163,7 +173,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
             showProgress(true);
 //            mAuthTask = new UserLoginTask(email, password);
 //            mAuthTask.execute((Void) null);
-            //registerTask(email, password);
+            registerTask(name, email, password);
         }
     }
 
@@ -203,27 +213,60 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         }
     }
 
-    private void registerTask(String email, String password) {
+    private void registerTask(String name, String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://217.61.2.26:8080/resteasy/rest/")
                 .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
                 .build();
 
         UserService service = retrofit.create(UserService.class);
-        User user = createUser(email, password);
+        User user = createUser(name, email, password);
+        Call<String> userCall = service.registerNewUser(user);
+        userCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                showProgress(false);
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Token: " + response.body());
+
+                    changeActivity(MainActivity.class);
+                }
+                else {
+                    try {
+                        mErrorView.setText(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                showProgress(false);
+
+                Log.e(TAG, t.toString());
+            }
+        });
     }
 
-    private User createUser(String email, String password) {
+    private User createUser(String name, String email, String password) {
+//        Date date = new Date();
+//        Timestamp timestamp = new Timestamp(date.getTime());
+
+        Profile profile = new Profile();
+        profile.setId(1);
+        profile.setName("User");
+
         User user = new User();
-//        user.setName();
-//        user.setPassword(password);
-//        user.setEmail(email);
-//        user.setProfile();
-//        user.setDeleted();
-//        user.setDateCreation(new Timestamp());
-//        user.setDateUpdated();
-//        user.setDateDeleted();
-//        user.setUserImage();
+        user.setName(name);
+        user.setPassword(RsaUtils.encrypt(password));
+        user.setEmail(email);
+        user.setProfile(profile);
+        user.setDeleted(new Byte((byte) 0));
+        user.setDateCreation(new Date().getTime());
+        user.setDateDeleted(0);
+        user.setUserImage(null);
 
         return user;
     }

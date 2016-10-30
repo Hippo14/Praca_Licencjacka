@@ -271,24 +271,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void changeActivity(Class clazz) {
         ActivityUtils.change(LoginActivity.this, clazz);
         finish();
-        runFadeAnimation();
-    }
-
-    private void runFadeAnimation() {
-        Animation popin = AnimationUtils.loadAnimation(this, R.anim.popin);
-        popin.reset();
-        Animation fadein = AnimationUtils.loadAnimation(this, R.anim.fadein);
-        fadein.reset();
-
-        LinearLayout ll = (LinearLayout) findViewById(R.id.email_login_form);
-        ll.clearAnimation();
-
-        AnimationSet animationSet = new AnimationSet(true);
-        animationSet.addAnimation(popin);
-        animationSet.addAnimation(fadein);
-
-
-        ll.startAnimation(animationSet);
     }
 
     private boolean isEmailValid(String email) {

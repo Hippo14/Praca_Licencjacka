@@ -15,4 +15,5 @@
         completions."
     </string>
     <string name="action_sign_up">Sign up</string>
+    <string name="prompt_name">Name</string>
 </resources>
