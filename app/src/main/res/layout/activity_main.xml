@@ -38,4 +38,43 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true" />
 
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/fabMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        app:fab_addButtonColorNormal="@color/white"
+        app:fab_addButtonColorPressed="@color/white_pressed"
+        app:fab_addButtonPlusIconColor="@color/half_black"
+        app:fab_addButtonSize="normal"
+        app:fab_labelStyle="@style/menu_labels_style"
+        app:fab_labelsPosition="right"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabSearchEvents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/white"
+            app:fab_icon="@mipmap/ic_search"
+            app:fab_size="mini"
+            app:fab_title="@string/searchEvents"
+            app:fab_colorPressed="@color/white_pressed"
+            app:srcCompat="@mipmap/ic_search" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/white"
+            app:fab_icon="@mipmap/ic_add"
+            app:fab_size="mini"
+            app:fab_title="@string/addEvent"
+            app:fab_colorPressed="@color/white_pressed"
+            app:srcCompat="@mipmap/ic_add" />
+
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
 </RelativeLayout>

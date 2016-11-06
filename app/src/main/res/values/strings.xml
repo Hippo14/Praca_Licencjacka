@@ -16,4 +16,7 @@
     </string>
     <string name="action_sign_up">Sign up</string>
     <string name="prompt_name">Name</string>
+    <string name="searchEvents">Search events</string>
+    <string name="addEvent">Add event</string>
+    <string name="title_activity_search_event">Map</string>
 </resources>

@@ -41,7 +41,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-public class RegisterActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class RegisterActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, IActivity {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -123,7 +123,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         changeActivity(LoginActivity.class);
     }
 
-    private void changeActivity(Class clazz) {
+    public void changeActivity(Class clazz) {
         ActivityUtils.change(RegisterActivity.this, clazz);
         finish();
     }

@@ -1,7 +1,5 @@
 package pl.code_zone.praca_licencjacka;
 
-import android.graphics.Color;
-import android.graphics.drawable.Icon;
 import android.support.v4.app.Fragment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -10,19 +8,27 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.RelativeLayout;
+
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import pl.code_zone.praca_licencjacka.fragments.BoardFragment;
 import pl.code_zone.praca_licencjacka.fragments.EventsFragment;
 import pl.code_zone.praca_licencjacka.fragments.UserFragment;
+import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IActivity {
 
     // UI
-    TabLayout tabLayout;
-    RelativeLayout relativeLayout;
-    ViewPager viewPager;
-    PagerAdapter fragmentPagerAdapter;
+    TabLayout mTabLayout;
+    RelativeLayout mRelativeLayout;
+    ViewPager mViewPager;
+    PagerAdapter mFragmentPagerAdapter;
+    FloatingActionsMenu mFam;
+    FloatingActionButton mFabSearch;
+    FloatingActionButton mFabAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,24 +36,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // TabLayout
-        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.contacts_icon));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.game_center_icon));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ibooks_author_icon));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        mTabLayout.addTab(mTabLayout.newTab().setIcon(R.drawable.contacts_icon));
+        mTabLayout.addTab(mTabLayout.newTab().setIcon(R.drawable.game_center_icon));
+        mTabLayout.addTab(mTabLayout.newTab().setIcon(R.drawable.ibooks_author_icon));
+        mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayoutMenu);
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        mRelativeLayout = (RelativeLayout) findViewById(R.id.relativeLayoutMenu);
+        mViewPager = (ViewPager) findViewById(R.id.viewPager);
 
-        fragmentPagerAdapter = new BoardPagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setOffscreenPageLimit(1);
-        viewPager.setAdapter(fragmentPagerAdapter);
+        mFragmentPagerAdapter = new BoardPagerAdapter(getSupportFragmentManager(), mTabLayout.getTabCount());
+        mViewPager.setOffscreenPageLimit(1);
+        mViewPager.setAdapter(mFragmentPagerAdapter);
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
+                mViewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
@@ -60,6 +66,29 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        mFam = (FloatingActionsMenu) findViewById(R.id.fabMenu);
+        mFabSearch = (FloatingActionButton) findViewById(R.id.fabSearchEvents);
+        mFabSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeActivity(SearchEventActivity.class);
+            }
+        });
+
+        mFabAdd = (FloatingActionButton) findViewById(R.id.fabAddEvent);
+        mFabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeActivity(AddEventActivity.class);
+            }
+        });
+    }
+
+    @Override
+    public void changeActivity(Class clazz) {
+        ActivityUtils.change(MainActivity.this, clazz);
+        finish();
     }
 
     private static class BoardPagerAdapter extends FragmentStatePagerAdapter {
