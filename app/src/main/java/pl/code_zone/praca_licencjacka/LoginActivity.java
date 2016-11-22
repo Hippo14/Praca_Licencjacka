@@ -3,6 +3,7 @@ package pl.code_zone.praca_licencjacka;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -38,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +49,7 @@ import java.util.List;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.RsaUtils;
+import pl.code_zone.praca_licencjacka.utils.SessionManager;
 import pl.code_zone.praca_licencjacka.webservice.UserService;
 import pl.code_zone.praca_licencjacka.webservice.credentials.EmailPassCred;
 import retrofit2.Call;
@@ -60,7 +63,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, IActivity {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -278,7 +281,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void changeActivity(Class clazz, HashMap<String, String> hashMap) {
-        ActivityUtils.change(LoginActivity.this, clazz,  hashMap);
+        ActivityUtils.change(LoginActivity.this, clazz);
+        // Session Manager get instance
+        SessionManager sm = SessionManager.getInstance(getApplicationContext());
+        sm.setToken(hashMap.get("token"));
         finish();
     }
     private boolean isEmailValid(String email) {

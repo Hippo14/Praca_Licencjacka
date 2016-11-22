@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import pl.code_zone.praca_licencjacka.R;
+import pl.code_zone.praca_licencjacka.utils.SessionManager;
 
 /**
  * Created by MSI on 2016-10-30.
@@ -30,8 +31,7 @@ public class UserFragment extends Fragment {
 
         mToken = (TextView) view.findViewById(R.id.token);
 
-        Intent intent = getActivity().getIntent();
-        String token= intent.getExtras().getString("token");
+        String token = SessionManager.getToken();
         mToken.setText(token);
 
         return view;

@@ -1,5 +1,7 @@
 package pl.code_zone.praca_licencjacka;
 
+import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -18,8 +20,9 @@ import pl.code_zone.praca_licencjacka.fragments.BoardFragment;
 import pl.code_zone.praca_licencjacka.fragments.EventsFragment;
 import pl.code_zone.praca_licencjacka.fragments.UserFragment;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
+import pl.code_zone.praca_licencjacka.utils.SessionManager;
 
-public class MainActivity extends AppCompatActivity implements IActivity {
+public class MainActivity extends AppCompatActivity {
 
     // UI
     TabLayout mTabLayout;
@@ -72,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements IActivity {
         mFabSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeActivity(SearchEventActivity.class);
+                ActivityUtils.change(MainActivity.this, SearchEventActivity.class);
+
             }
         });
 
@@ -80,15 +84,18 @@ public class MainActivity extends AppCompatActivity implements IActivity {
         mFabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeActivity(AddEventActivity.class);
+                ActivityUtils.change(MainActivity.this, AddEventActivity.class);
             }
         });
     }
 
     @Override
-    public void changeActivity(Class clazz) {
-        ActivityUtils.change(MainActivity.this, clazz);
-        finish();
+    protected void onResume() {
+        super.onResume();
+        String msg = SessionManager.getMessaage();
+        if (msg != null) {
+            Snackbar.make(findViewById(R.id.relativeLayoutMenu), msg, Snackbar.LENGTH_LONG).show();
+        }
     }
 
     private static class BoardPagerAdapter extends FragmentStatePagerAdapter {

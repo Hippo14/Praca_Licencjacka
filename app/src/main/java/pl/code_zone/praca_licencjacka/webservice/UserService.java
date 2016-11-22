@@ -14,12 +14,6 @@ import retrofit2.http.Path;
 
 public interface UserService {
 
-//    @GET("user/get/{email}/{password}")
-//    Call<User> getUserByEmailAndPassword(@Path("email") String name, @Path("password") String password);
-
-//    @POST("user/login")
-//    Call<User> getUserByEmailAndPassword(@Body EmailPassCred emailPassCred);
-
     @POST("user/login")
     Call<String> getUserByEmailAndPassword(@Body EmailPassCred emailPassCred);
 
