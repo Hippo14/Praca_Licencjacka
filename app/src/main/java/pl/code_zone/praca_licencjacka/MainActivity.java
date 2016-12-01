@@ -1,13 +1,28 @@
 package pl.code_zone.praca_licencjacka;
 
+import android.*;
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Looper;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,15 +30,24 @@ import android.widget.RelativeLayout;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+
+import java.util.List;
 
 import pl.code_zone.praca_licencjacka.fragments.BoardFragment;
 import pl.code_zone.praca_licencjacka.fragments.EventsFragment;
 import pl.code_zone.praca_licencjacka.fragments.UserFragment;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
+import pl.code_zone.praca_licencjacka.utils.GpsManager;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int TAG_CODE_PERMISSION_LOCATION = 1;
     // UI
     TabLayout mTabLayout;
     RelativeLayout mRelativeLayout;
@@ -75,8 +99,17 @@ public class MainActivity extends AppCompatActivity {
         mFabSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ActivityUtils.change(MainActivity.this, SearchEventActivity.class);
-
+                // Check permissions
+                if ((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                        (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[] {
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION },
+                            TAG_CODE_PERMISSION_LOCATION);
+                }
+                else {
+                    googleMaps();
+                }
             }
         });
 
@@ -87,6 +120,65 @@ public class MainActivity extends AppCompatActivity {
                 ActivityUtils.change(MainActivity.this, AddEventActivity.class);
             }
         });
+    }
+
+    private void googleMaps() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try {
+            GpsManager.init(this, locationManager);
+            GpsManager.findLocation();
+
+            int gpsOff = gpsOff();
+            // If gps is turn off
+            if (gpsOff == GpsManager.GPS_OFF) {
+                GpsManager.dialog();
+            }
+            else {
+                ActivityUtils.change(MainActivity.this, SearchEventActivity.class);
+            }
+        } catch (SecurityException | Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int gpsOff() throws Settings.SettingNotFoundException {
+        return Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == TAG_CODE_PERMISSION_LOCATION) {
+            if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                googleMaps();
+            }
+            else {
+                Snackbar.make(findViewById(R.id.relativeLayoutMenu), "Permission for GPS not granted! Functionality off.", Snackbar.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        int gpsOff = RESULT_CANCELED;
+
+        try {
+            gpsOff = gpsOff();
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (gpsOff != GpsManager.GPS_OFF) {
+            switch (requestCode) {
+                case GpsManager.GPS_LOCATION:
+                    ActivityUtils.change(MainActivity.this, SearchEventActivity.class);
+                break;
+            }
+        }
     }
 
     @Override
@@ -123,4 +215,5 @@ public class MainActivity extends AppCompatActivity {
             return NUM_ITEMS;
         }
     }
+
 }
