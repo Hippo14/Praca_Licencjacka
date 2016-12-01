@@ -1,13 +1,22 @@
 package pl.code_zone.praca_licencjacka;
 
-import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
+import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.LocationUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
+import pl.code_zone.praca_licencjacka.webservice.EventService;
+import pl.code_zone.praca_licencjacka.webservice.credentials.EventCredentials;
+import pl.code_zone.praca_licencjacka.webservice.credentials.TokenEventCred;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -16,7 +25,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +41,10 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     private ScheduledThreadPoolExecutor scheduler = null;
     private LatLng location;
     private String cityName;
+    private List<Event> eventList;
+    private List<Marker> markerList;
+
+    private static final String TAG = SearchEventActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +54,9 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        eventList = new ArrayList<>();
+        markerList = new ArrayList<>();
     }
 
 
@@ -78,10 +98,63 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
                 getEvents(location);
             }
         }, 1, 15, TimeUnit.SECONDS);
+
+    }
+
+    private void addMarkers() {
+        Log.d("EventService", "Adding markers to map");
+
+        //mMap.clear();
+
+        for (Event event : eventList) {
+            MarkerOptions options = new MarkerOptions();
+            options.title(event.getName());
+            options.position(new LatLng(event.getLatitude(), event.getLongitude()));
+
+            Marker marker = mMap.addMarker(options);
+            markerList.add(marker);
+        }
     }
 
     private void getEvents(LatLng location) {
+        String cityName = LocationUtils.getCityName(new LatLng(location.latitude, location.longitude), getApplicationContext());
+        double latitude = location.latitude;
+        double longitude = location.longitude;
+        getEventsTask(cityName, latitude, longitude);
+    }
 
+    private void getEventsTask(String cityName, double latitude, double longitude) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://217.61.2.26:8080/resteasy/rest/")
+                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
+                .build();
+
+        EventService service = retrofit.create(EventService.class);
+        TokenEventCred cred = new TokenEventCred();
+        EventCredentials eventCredentials = new EventCredentials();
+        eventCredentials.setCityName(cityName);
+        eventCredentials.setLatitude(latitude);
+        eventCredentials.setLongitude(longitude);
+        cred.setToken(SessionManager.getToken());
+        cred.setBody(eventCredentials);
+
+        Call<List<Event>> userCall = service.getEvents(cred);
+        userCall.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                if (response.isSuccessful()) {
+                    Log.d("EventService", "Successfully download eventList...");
+                    eventList = response.body();
+                    addMarkers();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Event>> call, Throwable t) {
+                Log.d("EventService", "Error when download eventList...");
+                Log.e(TAG, t.toString());
+            }
+        });
     }
 
     public void cancelAlarm() {

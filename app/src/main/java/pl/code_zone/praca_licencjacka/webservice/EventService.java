@@ -6,6 +6,7 @@ import okhttp3.ResponseBody;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.webservice.credentials.EventCredentials;
 import pl.code_zone.praca_licencjacka.webservice.credentials.Token;
+import pl.code_zone.praca_licencjacka.webservice.credentials.TokenEventCred;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -20,6 +21,6 @@ public interface EventService {
     Call<ResponseBody> addNewEvent(@Body Token event);
 
     @POST("events/get")
-    Call<List<Event>> getEvents(@Body EventCredentials eventCredentials);
+    Call<List<Event>> getEvents(@Body TokenEventCred eventCredentials);
 
 }
