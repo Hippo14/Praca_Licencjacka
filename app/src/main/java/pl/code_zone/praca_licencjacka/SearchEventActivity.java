@@ -1,8 +1,11 @@
 package pl.code_zone.praca_licencjacka;
 
+import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
@@ -28,23 +31,35 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class SearchEventActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener {
+public class SearchEventActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener, GoogleMap.InfoWindowAdapter {
 
+    private static final int DETAILS_NOT_DOWNLOADED = -1;
+    private static final int DETAILS_DOWNLOADED = 0;
+    private static final int DETAILS_REFRESHED = 1;
     private GoogleMap mMap;
     private boolean isRunning = false;
     private ScheduledThreadPoolExecutor scheduler = null;
     private LatLng location;
     private String cityName;
+
     private List<Event> eventList;
     private List<Marker> markerList;
+    private Marker marker;
+
+    String markerDetailsTitle = null;
+    String markerDetailsUsername = null;
+    String markerDetailsDescription = null;
+
 
     private static final String TAG = SearchEventActivity.class.getSimpleName();
+    private int detailsStatus = DETAILS_NOT_DOWNLOADED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +86,11 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        //FIXME fix synchronization with marker details
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
@@ -85,6 +105,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         }
 
         mMap.setOnCameraMoveListener(this);
+        mMap.setInfoWindowAdapter(this);
     }
 
     private void scheduleAlarm() {
@@ -208,5 +229,83 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         Log.d("EventService", "onStart()");
         if (!isRunning)
             scheduleAlarm();
+    }
+
+    private pl.code_zone.praca_licencjacka.model.Marker getMarkerDetails(Marker marker) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://217.61.2.26:8080/resteasy/rest/")
+                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
+                .build();
+
+        EventService service = retrofit.create(EventService.class);
+        EventCredentials eventCredentials = new EventCredentials();
+        eventCredentials.setCityName(LocationUtils.getCityName(marker.getPosition(), getApplicationContext()));
+        eventCredentials.setLatitude(marker.getPosition().latitude);
+        eventCredentials.setLongitude(marker.getPosition().longitude);
+
+        TokenEventCred tokenEventCred = new TokenEventCred();
+
+        tokenEventCred.setToken(SessionManager.getToken());
+        tokenEventCred.setBody(eventCredentials);
+
+        Call<pl.code_zone.praca_licencjacka.model.Marker> userCall = service.getMarkerDetails(tokenEventCred);
+        pl.code_zone.praca_licencjacka.model.Marker userMarker = null;
+        try {
+            userMarker = userCall.execute().body();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return userMarker;
+//        Call<pl.code_zone.praca_licencjacka.model.Marker> userCall = service.getMarkerDetails(tokenEventCred);
+//        userCall.enqueue(new Callback<pl.code_zone.praca_licencjacka.model.Marker>() {
+//            @Override
+//            public void onResponse(Call<pl.code_zone.praca_licencjacka.model.Marker> call, Response<pl.code_zone.praca_licencjacka.model.Marker> response) {
+//                if (response.isSuccessful()) {
+//                    retrofitCallback.onSuccess(response.body());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<pl.code_zone.praca_licencjacka.model.Marker> call, Throwable t) {
+//                Log.e(TAG, t.toString());
+//            }
+//        });
+    }
+
+    @Override
+    public View getInfoWindow(final Marker marker) {
+        if (this.marker != marker) detailsStatus = DETAILS_NOT_DOWNLOADED;
+
+        SearchEventActivity.this.marker = marker;
+
+        // Getting view from the layout file
+        final View v = getLayoutInflater().inflate(R.layout.marker_layout, null);
+
+        pl.code_zone.praca_licencjacka.model.Marker userMarker = getMarkerDetails(marker);
+
+        TextView markerTitle = (TextView) v.findViewById(R.id.title);
+        TextView markerUsername = (TextView) v.findViewById(R.id.username);
+        TextView markerDescription = (TextView) v.findViewById(R.id.description);
+
+        markerTitle.setText(userMarker.getTitle());
+        markerUsername.setText(userMarker.getUsername());
+        markerDescription.setText(userMarker.getDescription());
+
+        return v;
+    }
+
+    @Override
+    public View getInfoContents(Marker marker) {
+//        if (SearchEventActivity.this.marker != null && SearchEventActivity.this.marker.isInfoWindowShown() && detailsStatus == DETAILS_DOWNLOADED) {
+//            detailsStatus = DETAILS_REFRESHED;
+//            SearchEventActivity.this.marker.showInfoWindow();
+//        }
+
+        return null;
+    }
+
+    public interface RetrofitCallback {
+        void onSuccess(pl.code_zone.praca_licencjacka.model.Marker result);
     }
 }

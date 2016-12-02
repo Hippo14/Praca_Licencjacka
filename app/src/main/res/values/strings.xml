@@ -22,4 +22,10 @@
     <string name="prompt_location">Location</string>
     <string name="prompt_description">Description</string>
     <string name="action_add_event">Add</string>
+
+    <string name="hint_username">username: </string>
+    <string name="hint_title">event: </string>
+    <string name="hint_description">description: </string>
+    <string name="event_details">Details</string>
+
 </resources>

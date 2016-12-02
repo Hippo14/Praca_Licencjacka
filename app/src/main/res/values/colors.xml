@@ -13,6 +13,7 @@
     <color name="fontColor">#000000</color>
 
     <color name="buttonBorder">#ffffff</color>
+    <color name="detailsBorder">#b2000000</color>
 
     <color name="white">#fafafa</color>
     <color name="white_pressed">#f1f1f1</color>
