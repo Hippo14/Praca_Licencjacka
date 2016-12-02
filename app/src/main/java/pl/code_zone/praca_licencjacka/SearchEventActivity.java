@@ -33,6 +33,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -40,9 +42,6 @@ import java.util.concurrent.TimeUnit;
 
 public class SearchEventActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener, GoogleMap.InfoWindowAdapter {
 
-    private static final int DETAILS_NOT_DOWNLOADED = -1;
-    private static final int DETAILS_DOWNLOADED = 0;
-    private static final int DETAILS_REFRESHED = 1;
     private GoogleMap mMap;
     private boolean isRunning = false;
     private ScheduledThreadPoolExecutor scheduler = null;
@@ -50,16 +49,10 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     private String cityName;
 
     private List<Event> eventList;
-    private List<Marker> markerList;
+    private HashMap<Marker, pl.code_zone.praca_licencjacka.model.Marker> markerList;
     private Marker marker;
 
-    String markerDetailsTitle = null;
-    String markerDetailsUsername = null;
-    String markerDetailsDescription = null;
-
-
     private static final String TAG = SearchEventActivity.class.getSimpleName();
-    private int detailsStatus = DETAILS_NOT_DOWNLOADED;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +64,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         mapFragment.getMapAsync(this);
 
         eventList = new ArrayList<>();
-        markerList = new ArrayList<>();
+        markerList = new LinkedHashMap<>();
     }
 
 
@@ -87,8 +80,8 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         //FIXME fix synchronization with marker details
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+//        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//        StrictMode.setThreadPolicy(policy);
 
 
         mMap = googleMap;
@@ -133,7 +126,11 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
             options.position(new LatLng(event.getLatitude(), event.getLongitude()));
 
             Marker marker = mMap.addMarker(options);
-            markerList.add(marker);
+            pl.code_zone.praca_licencjacka.model.Marker userMarker = new pl.code_zone.praca_licencjacka.model.Marker();
+            userMarker.setTitle(event.getName());
+            userMarker.setUsername(event.getUser().getName());
+            userMarker.setDescription(event.getDescription());
+            markerList.put(marker, userMarker);
         }
     }
 
@@ -275,14 +272,13 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public View getInfoWindow(final Marker marker) {
-        if (this.marker != marker) detailsStatus = DETAILS_NOT_DOWNLOADED;
-
         SearchEventActivity.this.marker = marker;
 
         // Getting view from the layout file
         final View v = getLayoutInflater().inflate(R.layout.marker_layout, null);
 
-        pl.code_zone.praca_licencjacka.model.Marker userMarker = getMarkerDetails(marker);
+        pl.code_zone.praca_licencjacka.model.Marker userMarker = markerList.get(marker);
+//        pl.code_zone.praca_licencjacka.model.Marker userMarker = getMarkerDetails(marker);
 
         TextView markerTitle = (TextView) v.findViewById(R.id.title);
         TextView markerUsername = (TextView) v.findViewById(R.id.username);
