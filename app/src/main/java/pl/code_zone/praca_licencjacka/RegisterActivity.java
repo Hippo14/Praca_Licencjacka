@@ -30,6 +30,7 @@ import java.util.HashMap;
 import pl.code_zone.praca_licencjacka.model.Profile;
 import pl.code_zone.praca_licencjacka.model.User;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
+import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.RsaUtils;
 import pl.code_zone.praca_licencjacka.webservice.UserService;
@@ -221,7 +222,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
 
     private void registerTask(String name, String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://217.61.2.26:8080/resteasy/rest/")
+                .baseUrl(Config.URL_WEBSERVICE)
                 .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
                 .build();
 

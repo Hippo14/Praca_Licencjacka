@@ -2,6 +2,7 @@ package pl.code_zone.praca_licencjacka.webservice;
 
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import pl.code_zone.praca_licencjacka.model.Event;
@@ -27,4 +28,12 @@ public interface EventService {
     @POST("events/marker")
     Call<Marker> getMarkerDetails(@Body TokenEventCred cred);
 
+    @POST("events/details")
+    Call<Event> getEventDetails(@Body TokenEventCred cred);
+
+    @POST("events/board")
+    Call<Map<String, Map<String, String>>> getBoard(@Body Map<String, Object> params);
+
+    @POST("events/getByUser")
+    Call<Map<String,Map<String,String>>> getEventsByUser(@Body Map<String, Object> params);
 }

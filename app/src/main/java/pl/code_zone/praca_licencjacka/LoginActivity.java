@@ -42,6 +42,7 @@ import java.util.List;
 
 
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
+import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.RsaUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
@@ -227,7 +228,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private void loginTask(String email, String password) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://217.61.2.26:8080/resteasy/rest/")
+                .baseUrl(Config.URL_WEBSERVICE)
                 .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
                 .build();
 

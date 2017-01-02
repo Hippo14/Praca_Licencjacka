@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:text="User"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/fontColor"
-        android:id="@+id/token" />
+    <ImageView
+        app:srcCompat="@color/backgroundStartColor"
+        android:id="@+id/imageView2"
+        android:layout_width="150dp"
+        android:layout_height="150dp" />
 
-</LinearLayout>
+    <TextView
+        android:text="date creation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView5"
+        android:layout_alignBottom="@+id/imageView2"
+        android:layout_toEndOf="@+id/imageView2" />
+
+    <TextView
+        android:text="email "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView6"
+        android:layout_above="@+id/textView5"
+        android:layout_toEndOf="@+id/imageView2"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:text="username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView4"
+        android:layout_above="@+id/textView6"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp" />
+</RelativeLayout>

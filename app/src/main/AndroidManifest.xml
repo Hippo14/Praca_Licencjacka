@@ -42,7 +42,8 @@
         <activity
             android:name=".SearchEventActivity"
             android:label="@string/title_activity_search_event" />
-        <activity android:name=".AddEventActivity"></activity>
+        <activity android:name=".AddEventActivity" />
+        <activity android:name=".EventDetailsActivity" />
     </application>
 
 </manifest>

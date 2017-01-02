@@ -1,6 +1,5 @@
 package pl.code_zone.praca_licencjacka;
 
-import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +8,7 @@ import android.widget.TextView;
 
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
+import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.LocationUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
@@ -31,8 +31,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,17 +38,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class SearchEventActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener, GoogleMap.InfoWindowAdapter {
+public class SearchEventActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener, GoogleMap.InfoWindowAdapter, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
     private boolean isRunning = false;
+    private boolean onMapReady = false;
     private ScheduledThreadPoolExecutor scheduler = null;
     private LatLng location;
     private String cityName;
 
-    private List<Event> eventList;
     private HashMap<Marker, pl.code_zone.praca_licencjacka.model.Marker> markerList;
-    private Marker marker;
 
     private static final String TAG = SearchEventActivity.class.getSimpleName();
 
@@ -63,8 +60,9 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        eventList = new ArrayList<>();
         markerList = new LinkedHashMap<>();
+
+        location = SessionManager.getLocation();
     }
 
 
@@ -83,12 +81,9 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
 //        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 //        StrictMode.setThreadPolicy(policy);
 
-
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
-
-        location = SessionManager.getLocation();
 
         cityName = LocationUtils.getCityName(location, getApplicationContext());
 
@@ -99,13 +94,18 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
 
         mMap.setOnCameraMoveListener(this);
         mMap.setInfoWindowAdapter(this);
+        mMap.setOnInfoWindowClickListener(this);
+        if (!isRunning) {
+            onMapReady = true;
+            scheduleAlarm();
+        }
     }
 
     private void scheduleAlarm() {
         Log.d("EventService", "Start Task");
         isRunning = true;
 
-        scheduler = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(2);
+        scheduler = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(3);
         scheduler.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -115,12 +115,12 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
 
     }
 
-    private void addMarkers() {
+    private void addMarkers(List<Event> body) {
         Log.d("EventService", "Adding markers to map");
 
         //mMap.clear();
 
-        for (Event event : eventList) {
+        for (Event event : body) {
             MarkerOptions options = new MarkerOptions();
             options.title(event.getName());
             options.position(new LatLng(event.getLatitude(), event.getLongitude()));
@@ -143,7 +143,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
 
     private void getEventsTask(String cityName, double latitude, double longitude) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://217.61.2.26:8080/resteasy/rest/")
+                .baseUrl(Config.URL_WEBSERVICE)
                 .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
                 .build();
 
@@ -162,8 +162,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 if (response.isSuccessful()) {
                     Log.d("EventService", "Successfully download eventList...");
-                    eventList = response.body();
-                    addMarkers();
+                    addMarkers(response.body());
                 }
             }
 
@@ -216,7 +215,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     public void onResume() {
         super.onResume();
         Log.d("EventService", "onResume()");
-        if (!isRunning)
+        if (!isRunning && onMapReady)
             scheduleAlarm();
     }
 
@@ -224,56 +223,12 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     public void onStart() {
         super.onStart();
         Log.d("EventService", "onStart()");
-        if (!isRunning)
+        if (!isRunning && onMapReady)
             scheduleAlarm();
-    }
-
-    private pl.code_zone.praca_licencjacka.model.Marker getMarkerDetails(Marker marker) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://217.61.2.26:8080/resteasy/rest/")
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
-
-        EventService service = retrofit.create(EventService.class);
-        EventCredentials eventCredentials = new EventCredentials();
-        eventCredentials.setCityName(LocationUtils.getCityName(marker.getPosition(), getApplicationContext()));
-        eventCredentials.setLatitude(marker.getPosition().latitude);
-        eventCredentials.setLongitude(marker.getPosition().longitude);
-
-        TokenEventCred tokenEventCred = new TokenEventCred();
-
-        tokenEventCred.setToken(SessionManager.getToken());
-        tokenEventCred.setBody(eventCredentials);
-
-        Call<pl.code_zone.praca_licencjacka.model.Marker> userCall = service.getMarkerDetails(tokenEventCred);
-        pl.code_zone.praca_licencjacka.model.Marker userMarker = null;
-        try {
-            userMarker = userCall.execute().body();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return userMarker;
-//        Call<pl.code_zone.praca_licencjacka.model.Marker> userCall = service.getMarkerDetails(tokenEventCred);
-//        userCall.enqueue(new Callback<pl.code_zone.praca_licencjacka.model.Marker>() {
-//            @Override
-//            public void onResponse(Call<pl.code_zone.praca_licencjacka.model.Marker> call, Response<pl.code_zone.praca_licencjacka.model.Marker> response) {
-//                if (response.isSuccessful()) {
-//                    retrofitCallback.onSuccess(response.body());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<pl.code_zone.praca_licencjacka.model.Marker> call, Throwable t) {
-//                Log.e(TAG, t.toString());
-//            }
-//        });
     }
 
     @Override
     public View getInfoWindow(final Marker marker) {
-        SearchEventActivity.this.marker = marker;
-
         // Getting view from the layout file
         final View v = getLayoutInflater().inflate(R.layout.marker_layout, null);
 
@@ -293,15 +248,15 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public View getInfoContents(Marker marker) {
-//        if (SearchEventActivity.this.marker != null && SearchEventActivity.this.marker.isInfoWindowShown() && detailsStatus == DETAILS_DOWNLOADED) {
-//            detailsStatus = DETAILS_REFRESHED;
-//            SearchEventActivity.this.marker.showInfoWindow();
-//        }
-
         return null;
     }
 
-    public interface RetrofitCallback {
-        void onSuccess(pl.code_zone.praca_licencjacka.model.Marker result);
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("latitude", Double.toString(marker.getPosition().latitude));
+        params.put("longitude", Double.toString(marker.getPosition().longitude));
+        ActivityUtils.change(this, EventDetailsActivity.class, params);
     }
+
 }
