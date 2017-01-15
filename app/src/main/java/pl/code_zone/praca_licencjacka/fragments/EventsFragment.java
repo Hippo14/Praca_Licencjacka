@@ -14,10 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pl.code_zone.praca_licencjacka.EventDetailsActivity;
 import pl.code_zone.praca_licencjacka.R;
 import pl.code_zone.praca_licencjacka.adapter.EventAdapter;
 import pl.code_zone.praca_licencjacka.row.BoardRow;
 import pl.code_zone.praca_licencjacka.row.EventRow;
+import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
@@ -92,7 +94,7 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
                     String key = elem.getKey();
                     Map<String, String> value = elem.getValue();
 
-                    list.add(new EventRow(value.get("name"), value.get("description")));
+                    list.add(new EventRow(value.get("name"), value.get("description"), value.get("latitude"), value.get("longitude")));
                 }
 
                 // Refresh list
@@ -110,6 +112,10 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        EventRow eventRow = list.get(position);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("latitude", eventRow.getLatitude());
+        params.put("longitude", eventRow.getLongitude());
+        ActivityUtils.change(getContext(), EventDetailsActivity.class, params);
     }
 }

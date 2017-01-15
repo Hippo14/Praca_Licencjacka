@@ -33,6 +33,7 @@ import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.RsaUtils;
+import pl.code_zone.praca_licencjacka.utils.SessionManager;
 import pl.code_zone.praca_licencjacka.webservice.UserService;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -130,7 +131,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
     }
 
     private void changeActivity(Class clazz, HashMap<String, String> hashMap) {
-        ActivityUtils.change(RegisterActivity.this, clazz,  hashMap);
+        ActivityUtils.change(RegisterActivity.this, clazz);
+        // Session Manager get instance
+        SessionManager sm = SessionManager.getInstance(getApplicationContext());
+        sm.setToken(hashMap.get("token"));
         finish();
     }
 

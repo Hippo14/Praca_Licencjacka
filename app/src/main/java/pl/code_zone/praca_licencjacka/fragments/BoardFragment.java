@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +81,9 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     public void getBoardList() {
-        boardTask();
+        LatLng location = SessionManager.getLocation();
+        if (location != null)
+            boardTask();
     }
 
     public void boardTask() {

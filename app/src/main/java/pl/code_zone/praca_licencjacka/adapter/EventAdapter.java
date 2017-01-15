@@ -31,7 +31,7 @@ public class EventAdapter extends ArrayAdapter<EventRow> {
     public View getView(int position, View convertView, ViewGroup parent) {
         EventRow eventRow = getItem(position);
 
-        if (convertView == null) convertView = LayoutInflater.from(getContext()).inflate(R.layout.board_adapter, parent, false);
+        if (convertView == null) convertView = LayoutInflater.from(getContext()).inflate(R.layout.event_adapter, parent, false);
 
         eventName = (TextView) convertView.findViewById(R.id.eventName);
         description = (TextView) convertView.findViewById(R.id.description);
