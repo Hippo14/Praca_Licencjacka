@@ -12,8 +12,14 @@ import android.os.HandlerThread;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.HashMap;
+
+import pl.code_zone.praca_licencjacka.MainActivity;
+import pl.code_zone.praca_licencjacka.SearchEventActivity;
 
 /**
  * Created by MSI on 2016-12-01.
@@ -70,7 +76,11 @@ public class GpsManager {
                 public void onLocationChanged(Location location) {
                     synchronized (latLng) {
                         latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                        SessionManager.setLocation(latLng);
+                        Log.d("EventService", "onLocationChanged() Location: " + latLng.latitude + ", " + latLng.longitude);
+                        HashMap<String, String> params = new HashMap<>();
+                        params.put("latitude", Double.toString(latLng.latitude));
+                        params.put("longitude", Double.toString(latLng.longitude));
+                        ActivityUtils.change(activity, SearchEventActivity.class, params);
                     }
                 }
 

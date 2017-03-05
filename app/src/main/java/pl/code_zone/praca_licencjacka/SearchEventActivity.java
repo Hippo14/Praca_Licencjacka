@@ -44,7 +44,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     private boolean isRunning = false;
     private boolean onMapReady = false;
     private ScheduledThreadPoolExecutor scheduler = null;
-    private LatLng location;
+    private LatLng location = null;
     private String cityName;
 
     private HashMap<Marker, pl.code_zone.praca_licencjacka.model.Marker> markerList;
@@ -54,6 +54,8 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d("EventService", "onCreate()");
         setContentView(R.layout.activity_search_event);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -62,7 +64,22 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
 
         markerList = new LinkedHashMap<>();
 
-        location = SessionManager.getLocation();
+        String latitude = null;
+        String longitude = null;
+
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                latitude = extras.getString("latitude");
+                longitude = extras.getString("longitude");
+            }
+        } else {
+            latitude = (String) savedInstanceState.getSerializable("latitude");
+            longitude = (String) savedInstanceState.getSerializable("longitude");
+        }
+
+        location = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+        Log.d("EventService", "onCreate() Location: " + location.latitude + ", " + location.longitude);
     }
 
 
@@ -95,6 +112,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         mMap.setOnCameraMoveListener(this);
         mMap.setInfoWindowAdapter(this);
         mMap.setOnInfoWindowClickListener(this);
+
         if (!isRunning) {
             onMapReady = true;
             scheduleAlarm();
@@ -105,11 +123,14 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         Log.d("EventService", "Start Task");
         isRunning = true;
 
+        final LatLng params = location;
+
         scheduler = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(3);
         scheduler.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                getEvents(location);
+                Log.d("EventService", "run() Location: " + params.longitude + ", " + params.latitude);
+                getEvents(params);
             }
         }, 1, 15, TimeUnit.SECONDS);
 
@@ -135,9 +156,10 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private void getEvents(LatLng location) {
-        String cityName = LocationUtils.getCityName(new LatLng(location.latitude, location.longitude), getApplicationContext());
+        String cityName = LocationUtils.getCityName(location, getApplicationContext());
         double latitude = location.latitude;
         double longitude = location.longitude;
+
         getEventsTask(cityName, latitude, longitude);
     }
 
@@ -162,6 +184,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 if (response.isSuccessful()) {
                     Log.d("EventService", "Successfully download eventList...");
+
                     addMarkers(response.body());
                 }
             }
@@ -214,9 +237,6 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("EventService", "onResume()");
-        if (!isRunning && onMapReady)
-            scheduleAlarm();
     }
 
     @Override

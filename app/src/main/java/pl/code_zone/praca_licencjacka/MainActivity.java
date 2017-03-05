@@ -125,16 +125,14 @@ public class MainActivity extends AppCompatActivity {
     private void googleMaps() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         try {
-            GpsManager.init(this, locationManager);
-            GpsManager.findLocation();
-
             int gpsOff = gpsOff();
             // If gps is turn off
             if (gpsOff == GpsManager.GPS_OFF) {
                 GpsManager.dialog();
             }
             else {
-                ActivityUtils.change(MainActivity.this, SearchEventActivity.class);
+                GpsManager.init(this, locationManager);
+                GpsManager.findLocation();
             }
         } catch (SecurityException | Settings.SettingNotFoundException e) {
             e.printStackTrace();
@@ -175,7 +173,9 @@ public class MainActivity extends AppCompatActivity {
         if (gpsOff != GpsManager.GPS_OFF) {
             switch (requestCode) {
                 case GpsManager.GPS_LOCATION:
-                    ActivityUtils.change(MainActivity.this, SearchEventActivity.class);
+                    LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                    GpsManager.init(this, locationManager);
+                    GpsManager.findLocation();
                 break;
             }
         }
