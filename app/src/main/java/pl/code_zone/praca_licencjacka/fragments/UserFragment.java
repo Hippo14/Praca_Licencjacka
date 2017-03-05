@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.util.LruCache;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,9 +53,39 @@ public class UserFragment extends Fragment {
     private TextView email;
     private TextView dateCreation;
 
+    private LruCache<String, Bitmap> memoryCache;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final int memory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        final int cacheSize = memory / 8;
+        memoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                return (bitmap.getRowBytes() * bitmap.getHeight()) / 1024;
+            }
+        };
+    }
+
+    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (getBitmapFromMemCache(key) == null) {
+            memoryCache.put(key, bitmap);
+        }
+    }
+
+    private Bitmap getBitmapFromMemCache(String key) {
+        return memoryCache.get(key);
+    }
+
+    public void loadBitmap(String imageKey, ImageView imageView) {
+        final Bitmap bitmap = getBitmapFromMemCache(imageKey);
+        if (bitmap != null) {
+            imageView.setImageBitmap(bitmap);
+        } else {
+            getUserLogo();
+        }
     }
 
     @Override
@@ -86,7 +117,7 @@ public class UserFragment extends Fragment {
 
     public void getUser() {
         getUserTask();
-        getUserLogo();
+        loadBitmap("logo", imageView);
     }
 
     public void getUserTask() {
@@ -146,6 +177,7 @@ public class UserFragment extends Fragment {
                 byte[] decodedString = Base64.decode(imageBase64, Base64.NO_WRAP);
                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
                 imageView.setImageBitmap(ImageConverter.getRoundedCornerBitmap(decodedByte, 100));
+                addBitmapToMemoryCache("logo", decodedByte);
             }
 
             @Override
