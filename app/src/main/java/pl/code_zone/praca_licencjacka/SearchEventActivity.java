@@ -277,6 +277,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         HashMap<String, String> params = new HashMap<>();
         params.put("latitude", Double.toString(marker.getPosition().latitude));
         params.put("longitude", Double.toString(marker.getPosition().longitude));
+        params.put("context", "searchEventActivity");
         ActivityUtils.change(this, EventDetailsActivity.class, params);
     }
 

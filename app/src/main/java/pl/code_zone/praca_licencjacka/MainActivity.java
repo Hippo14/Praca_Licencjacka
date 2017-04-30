@@ -124,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void googleMaps() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        GpsManager.init(this, locationManager);
+
         try {
             int gpsOff = gpsOff();
             // If gps is turn off
@@ -131,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 GpsManager.dialog();
             }
             else {
-                GpsManager.init(this, locationManager);
                 GpsManager.findLocation();
             }
         } catch (SecurityException | Settings.SettingNotFoundException e) {

@@ -206,13 +206,16 @@ public class UserFragment extends Fragment {
                 }
             break;
             case PIC_CROP:
-                Bundle extras = data.getExtras();
-                Bitmap picture = extras.getParcelable("data");
-                picture = ImageConverter.getRoundedCornerBitmap(picture, 100);
-                // TODO Send to server
-                setUserLogo(picture);
+                try {
+                    Bundle extras = data.getExtras();
+                    Bitmap picture = extras.getParcelable("data");
+                    picture = ImageConverter.getRoundedCornerBitmap(picture, 100);
+                    // TODO Send to server
+                    setUserLogo(picture);
 
-                imageView.setImageBitmap(picture);
+                    imageView.setImageBitmap(picture);
+                } catch(Exception e) {
+                }
             break;
         }
     }

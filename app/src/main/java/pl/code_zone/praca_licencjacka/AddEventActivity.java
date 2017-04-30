@@ -82,6 +82,18 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                 onAddEventClick();
             }
         });
+
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                if (marker != null)
+                    marker.remove();
+                marker = mGoogleMap.addMarker(new MarkerOptions().position(latLng));
+                marker.setTitle("");
+                marker.showInfoWindow();
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.0f));
+            }
+        });
     }
 
     private void onAddEventClick() {
@@ -105,12 +117,15 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         credentials.setToken(token);
         credentials.setBody(event);
 
-        Call<ResponseBody> eventCall = service.addNewEvent(credentials);
-        eventCall.enqueue(new Callback<ResponseBody>() {
+        Call<String> eventCall = service.addNewEvent(credentials);
+        eventCall.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()) {
-                    SessionManager.setMessage(response.message());
+                    String bodyString = null;
+                    bodyString = new String(response.body());
+
+                    SessionManager.setMessage(bodyString);
                     onBackPressed();
                 }
                 else {
@@ -123,7 +138,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<String> call, Throwable t) {
                 // TODO Snackbar error
                 Snackbar.make(findViewById(R.id.activity_add_event), t.toString(), Snackbar.LENGTH_LONG).show();
             }

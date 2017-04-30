@@ -20,7 +20,7 @@ import retrofit2.http.POST;
 public interface EventService {
 
     @POST("events/add")
-    Call<ResponseBody> addNewEvent(@Body Token event);
+    Call<String> addNewEvent(@Body Token event);
 
     @POST("events/get")
     Call<List<Event>> getEvents(@Body TokenEventCred eventCredentials);
@@ -36,4 +36,7 @@ public interface EventService {
 
     @POST("events/getByUser")
     Call<Map<String,Map<String,String>>> getEventsByUser(@Body Map<String, Object> params);
+
+    @POST("events/getUserListEvent")
+    Call<Map<String,Map<String,String>>> getUserListEvent(@Body Map<String, Object> params);
 }
