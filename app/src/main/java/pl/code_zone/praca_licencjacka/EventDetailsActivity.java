@@ -1,6 +1,7 @@
 package pl.code_zone.praca_licencjacka;
 
 import android.app.ProgressDialog;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -71,7 +72,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                addUserToEvent();
             }
         });
 
@@ -90,6 +91,42 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(this);
         populate();
+    }
+
+    private void addUserToEvent() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Config.URL_WEBSERVICE)
+                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
+                .build();
+        EventService service = retrofit.create(EventService.class);
+
+        Map<String, String> body = new HashMap<>();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("token", SessionManager.getToken());
+        params.put("body", body);
+
+        Call<String> userCall = service.addUserToEvent(params);
+        userCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Snackbar.make(findViewById(R.id.activity_add_event), "Added to favourite!", Snackbar.LENGTH_LONG).show();
+                }
+                else {
+                    try {
+                        Snackbar.make(findViewById(R.id.activity_add_event), response.errorBody().string(), Snackbar.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Snackbar.make(findViewById(R.id.activity_add_event), t.toString(), Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     public void getDetails(double latitude, double longitude) {
@@ -122,6 +159,8 @@ public class EventDetailsActivity extends AppCompatActivity {
                     markerDateCreated.setText(dt1.format(dateCreated));
                     markerDateEnd.setText(dt1.format(dateEnd));
                     markerCategory.setText(response.body().getCategory().getName());
+
+                    progressDialog.dismiss();
                 }
                 else {
                     progressDialog.dismiss();
