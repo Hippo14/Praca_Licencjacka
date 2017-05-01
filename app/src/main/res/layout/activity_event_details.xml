@@ -82,24 +82,13 @@
         android:layout_toEndOf="@+id/descriptionHint"
         android:layout_marginLeft="3dp" />
 
-    <Button
-        android:id="@+id/event_sign_in"
-        style="@android:style/TextAppearance.Material.Small"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/event_sign_in"
-        android:layout_weight="6.47"
-        android:background="@drawable/button_border"
-        android:textStyle="bold"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
-
     <ListView
         android:id="@+id/userList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/categoryHint" />
+        android:layout_below="@+id/categoryHint"
+        android:layout_above="@+id/event_sign_in" />
 
     <TextView
         android:text="@string/hint_endDate"
@@ -154,5 +143,17 @@
         android:layout_marginLeft="3dp"
         android:layout_below="@+id/endDate"
         android:layout_toEndOf="@+id/endDateHint" />
+
+    <Button
+        android:id="@+id/event_sign_in"
+        style="@android:style/TextAppearance.Material.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/event_sign_in"
+        android:layout_weight="6.47"
+        android:background="@drawable/button_border"
+        android:textStyle="bold"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

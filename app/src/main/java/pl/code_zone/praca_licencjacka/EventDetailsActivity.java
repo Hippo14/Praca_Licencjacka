@@ -4,7 +4,9 @@ import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,6 +43,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     TextView markerDateEnd;
     TextView markerCategory;
 
+    Button mButton;
+
     ListView userList;
     ArrayAdapter<String> adapter;
 
@@ -63,9 +67,26 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         userList = (ListView) findViewById(R.id.userList);
 
+        mButton = (Button) findViewById(R.id.event_sign_in);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+
         context = (String) getIntent().getExtras().get("context");
         latitude = Double.parseDouble((String) getIntent().getExtras().get("latitude"));
         longitude = Double.parseDouble((String) getIntent().getExtras().get("longitude"));
+
+        if ("EventFragment".equals(context)) {
+            mButton.setVisibility(View.GONE);
+        } else {
+            mButton.setVisibility(View.VISIBLE);
+        }
+
 
         progressDialog = new ProgressDialog(this);
         populate();

@@ -116,6 +116,7 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         EventRow eventRow = list.get(position);
         HashMap<String, String> params = new HashMap<>();
+        params.put("context", "EventFragment");
         params.put("latitude", eventRow.getLatitude());
         params.put("longitude", eventRow.getLongitude());
         ActivityUtils.change(getContext(), EventDetailsActivity.class, params);
