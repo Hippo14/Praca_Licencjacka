@@ -13,7 +13,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1.0"
+        android:layout_weight="2.0"
         android:orientation="vertical" >
 
         <fragment
@@ -65,9 +65,42 @@
                     android:inputType="text"
                     android:maxLines="5"
                     android:selectAllOnFocus="false"
-                    android:layout_height="150dp" />
+                    android:layout_height="wrap_content" />
 
             </android.support.design.widget.TextInputLayout>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/eventCategories"
+                android:layout_weight="1"
+                android:spinnerMode="dialog" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                    android:ems="10"
+                    android:id="@+id/fromDate"
+                    android:hint="@string/prompt_fromDate"
+                    android:layout_weight="1" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                    android:ems="10"
+                    android:id="@+id/toDate"
+                    android:hint="@string/prompt_toDate"
+                    android:layout_weight="1" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/event_add"

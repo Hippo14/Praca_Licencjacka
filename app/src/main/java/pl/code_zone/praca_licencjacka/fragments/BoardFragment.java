@@ -111,7 +111,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                     String key = elem.getKey();
                     Map<String, String> value = elem.getValue();
 
-                    list.add(new BoardRow(value.get("name"), value.get("username"), value.get("description")));
+                    list.add(new BoardRow(value.get("name"), value.get("username"), value.get("description"), value.get("image")));
                 }
 
                 // Refresh list
