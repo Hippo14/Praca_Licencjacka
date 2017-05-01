@@ -89,18 +89,20 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
         boardCall.enqueue(new Callback<Map<String, Map<String, String>>>() {
             @Override
             public void onResponse(Call<Map<String, Map<String, String>>> call, Response<Map<String, Map<String, String>>> response) {
-                // Add hashmap to list
-                for (Map.Entry<String, Map<String, String>> elem : response.body().entrySet()) {
-                    String key = elem.getKey();
-                    Map<String, String> value = elem.getValue();
+                if (response.body() != null) {
+                    // Add hashmap to list
+                    for (Map.Entry<String, Map<String, String>> elem : response.body().entrySet()) {
+                        String key = elem.getKey();
+                        Map<String, String> value = elem.getValue();
 
-                    list.add(new EventRow(value.get("name"), value.get("description"), value.get("latitude"), value.get("longitude")));
+                        list.add(new EventRow(value.get("name"), value.get("description"), value.get("latitude"), value.get("longitude")));
+                    }
+
+                    // Refresh list
+                    eventAdapter.notifyDataSetChanged();
+
+                    Log.d(TAG, String.valueOf(response.body()));
                 }
-
-                // Refresh list
-                eventAdapter.notifyDataSetChanged();
-
-                Log.d(TAG, String.valueOf(response.body()));
             }
 
             @Override

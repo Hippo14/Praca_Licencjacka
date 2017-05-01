@@ -106,18 +106,20 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
         boardCall.enqueue(new Callback<Map<String, Map<String, String>>>() {
             @Override
             public void onResponse(Call<Map<String, Map<String, String>>> call, Response<Map<String, Map<String, String>>> response) {
-                // Add hashmap to list
-                for (Map.Entry<String, Map<String, String>> elem : response.body().entrySet()) {
-                    String key = elem.getKey();
-                    Map<String, String> value = elem.getValue();
+                if (response.body() != null) {
+                    // Add hashmap to list
+                    for (Map.Entry<String, Map<String, String>> elem : response.body().entrySet()) {
+                        String key = elem.getKey();
+                        Map<String, String> value = elem.getValue();
 
-                    list.add(new BoardRow(value.get("name"), value.get("username"), value.get("description"), value.get("image")));
+                        list.add(new BoardRow(value.get("name"), value.get("username"), value.get("description"), value.get("image")));
+                    }
+
+                    // Refresh list
+                    boardAdapter.notifyDataSetChanged();
+
+                    Log.d(TAG, String.valueOf(response.body()));
                 }
-
-                // Refresh list
-                boardAdapter.notifyDataSetChanged();
-
-                Log.d(TAG, String.valueOf(response.body()));
             }
 
             @Override
