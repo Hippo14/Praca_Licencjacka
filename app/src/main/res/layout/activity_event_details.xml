@@ -13,6 +13,16 @@
     tools:context="pl.code_zone.praca_licencjacka.EventDetailsActivity">
 
     <TextView
+        android:text="@string/hint_startDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dateCreatedHint"
+        android:textColor="@color/half_black"
+        android:textSize="12sp"
+        android:layout_below="@+id/descriptionHint"
+        android:layout_alignParentStart="true" />
+
+    <TextView
         android:text="@string/hint_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text=" "
         android:id="@+id/title"
         android:textColor="@color/fontColor"
         android:layout_alignBottom="@+id/titleHint"
@@ -55,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text=" "
         android:id="@+id/username"
         android:textColor="@color/fontColor"
         android:layout_below="@+id/title"
@@ -65,7 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text=" "
         android:id="@+id/description"
         android:textColor="@color/fontColor"
         android:layout_alignTop="@+id/descriptionHint"
@@ -88,8 +98,61 @@
         android:id="@+id/userList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/description"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/event_sign_in" />
+        android:layout_below="@+id/categoryHint" />
+
+    <TextView
+        android:text="@string/hint_endDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/endDateHint"
+        android:textColor="@color/half_black"
+        android:textSize="12sp"
+        android:layout_below="@+id/dateCreatedHint"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=" "
+        android:id="@+id/dateCreated"
+        android:textColor="@color/fontColor"
+        android:layout_marginLeft="3dp"
+        android:layout_alignBaseline="@+id/dateCreatedHint"
+        android:layout_alignBottom="@+id/dateCreatedHint"
+        android:layout_toEndOf="@+id/dateCreatedHint" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=" "
+        android:id="@+id/endDate"
+        android:textColor="@color/fontColor"
+        android:layout_marginLeft="3dp"
+        android:layout_alignBottom="@+id/endDateHint"
+        android:layout_toEndOf="@+id/endDateHint" />
+
+    <TextView
+        android:text="@string/hint_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/categoryHint"
+        android:textColor="@color/half_black"
+        android:textSize="12sp"
+        android:layout_below="@+id/endDateHint"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=" "
+        android:id="@+id/category"
+        android:textColor="@color/fontColor"
+        android:layout_marginLeft="3dp"
+        android:layout_below="@+id/endDate"
+        android:layout_toEndOf="@+id/endDateHint" />
 
 </RelativeLayout>

@@ -9,7 +9,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,9 @@ public class EventDetailsActivity extends AppCompatActivity {
     TextView markerTitle;
     TextView markerUsername;
     TextView markerDescription;
+    TextView markerDateCreated;
+    TextView markerDateEnd;
+    TextView markerCategory;
 
     ListView userList;
     ArrayAdapter<String> adapter;
@@ -51,6 +57,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         markerTitle = (TextView) findViewById(R.id.title);
         markerUsername = (TextView) findViewById(R.id.username);
         markerDescription = (TextView) findViewById(R.id.description);
+        markerDateCreated = (TextView) findViewById(R.id.dateCreated);
+        markerDateEnd = (TextView) findViewById(R.id.endDate);
+        markerCategory = (TextView) findViewById(R.id.category);
 
         userList = (ListView) findViewById(R.id.userList);
 
@@ -84,6 +93,14 @@ public class EventDetailsActivity extends AppCompatActivity {
                     markerTitle.setText(response.body().getName());
                     markerUsername.setText(response.body().getUser().getName());
                     markerDescription.setText(response.body().getDescription());
+
+                    Date dateCreated = new Date(response.body().getDateCreation());
+                    Date dateEnd = new Date(response.body().getDateEnding());
+                    SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
+
+                    markerDateCreated.setText(dt1.format(dateCreated));
+                    markerDateEnd.setText(dt1.format(dateEnd));
+                    markerCategory.setText(response.body().getCategory().getName());
                 }
                 else {
                     progressDialog.dismiss();
