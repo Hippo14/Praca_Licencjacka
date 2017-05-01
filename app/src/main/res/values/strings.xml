@@ -104,5 +104,6 @@
     <string name="prompt_fromDate">Before</string>
     <string name="prompt_toDate">After</string>
     <string name="prompt_date">Date</string>
+    <string name="prompt_category">Categories</string>
 
 </resources>

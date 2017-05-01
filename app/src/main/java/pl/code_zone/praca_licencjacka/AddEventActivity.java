@@ -13,9 +13,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -39,12 +41,14 @@ import java.util.List;
 import java.util.Locale;
 
 import okhttp3.ResponseBody;
+import pl.code_zone.praca_licencjacka.adapter.SpinnerAdapter;
 import pl.code_zone.praca_licencjacka.model.Category;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.model.User;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
+import pl.code_zone.praca_licencjacka.webservice.CategoryService;
 import pl.code_zone.praca_licencjacka.webservice.EventService;
 import pl.code_zone.praca_licencjacka.webservice.credentials.Token;
 import retrofit2.Call;
@@ -74,6 +78,8 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     private Date beforeDate;
     private Date afterDate;
 
+    private Spinner mEventCategories;
+
     private ProgressDialog mProgressDialog;
 
     @Override
@@ -98,6 +104,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         mDescription = (EditText) findViewById(R.id.description);
         mFromDate = (EditText) findViewById(R.id.fromDate);
         mToDate = (EditText) findViewById(R.id.toDate);
+        mEventCategories = (Spinner) findViewById(R.id.eventCategories);
 
         DialogTest fromDate = new DialogTest(mFromDate, "From date");
         DialogTest toDate = new DialogTest(mToDate, "To date");
@@ -107,6 +114,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         mToDate.setOnFocusChangeListener(toDate);
         mToDate.setOnClickListener(toDate);
 
+        populateSpinner();
 
 
         mLocation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -136,12 +144,68 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         });
     }
 
+    private void populateSpinner() {
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setTitle("Loading");
+        mProgressDialog.setMessage("Wait while loading");
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+
+        getCategories();
+    }
+
     private void onAddEventClick() {
-        if (beforeDate != null && afterDate != null && beforeDate.before(afterDate) &&
+        Category selectedItem = (Category) mEventCategories.getSelectedItem();
+        if (beforeDate != null && afterDate != null && beforeDate.before(afterDate) && selectedItem.getId() != 999 && !" ".equals(selectedItem.getName()) &&
                 marker != null && marker.getTitle() != null && mDescription.getText() != null && beforeDate != null) {
                 addEvent(marker, mDescription);
         }
     }
+
+    private void getCategories() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Config.URL_WEBSERVICE)
+                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
+                .build();
+
+        CategoryService service = retrofit.create(CategoryService.class);
+
+        String token = SessionManager.getToken();
+
+        Token credentials = new Token();
+        credentials.setToken(token);
+
+        Call<List<Category>> eventCall = service.getAll(credentials);
+        eventCall.enqueue(new Callback<List<Category>>() {
+            @Override
+            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                if (response.isSuccessful()) {
+                    List<Category> categories = new ArrayList<>();
+                    categories.add(new Category(999, " "));
+                    categories.addAll(response.body());
+                    ArrayAdapter<Category> dataAdapter = new SpinnerAdapter(AddEventActivity.this, R.layout.spinner, categories);
+                    mEventCategories.setAdapter(dataAdapter);
+                } else {
+                    try {
+                        Snackbar.make(findViewById(R.id.activity_add_event), response.errorBody().string(), Snackbar.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mProgressDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+                // TODO Snackbar error
+                mProgressDialog.dismiss();
+                Snackbar.make(findViewById(R.id.activity_add_event), t.toString(), Snackbar.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
 
     private void addEvent(Marker marker, EditText mDescription) {
         Retrofit retrofit = new Retrofit.Builder()
@@ -150,7 +214,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                 .build();
 
         EventService service = retrofit.create(EventService.class);
-        Event event = createEvent(marker, mDescription, beforeDate, afterDate);
+        Event event = createEvent(marker, mDescription, beforeDate, afterDate, (Category)mEventCategories.getSelectedItem());
 
         String token = SessionManager.getToken();
 
@@ -184,7 +248,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         });
     }
 
-    private Event createEvent(Marker marker, EditText mDescription, Date dateCreation, Date dateEnding) {
+    private Event createEvent(Marker marker, EditText mDescription, Date dateCreation, Date dateEnding, Category category) {
         Event event = new Event();
         event.setName(marker.getTitle());
         event.setDescription(mDescription.getText().toString());
@@ -194,9 +258,6 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         User user = new User();
         event.setUser(user);
 
-        Category category = new Category();
-        category.setId(1);
-        category.setName("Main category");
         event.setCategory(category);
 
         event.setDeleted((byte) 0);
