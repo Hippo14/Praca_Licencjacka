@@ -28,6 +28,8 @@ public class User {
     long dateDeleted;
     @SerializedName("userImage")
     String userImage;
+    @SerializedName("usersLogo")
+    UsersLogo usersLogo;
 
     public String getName() {
         return name;
@@ -99,5 +101,21 @@ public class User {
 
     public void setUserImage(String userImage) {
         this.userImage = userImage;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public UsersLogo getUsersLogo() {
+        return usersLogo;
+    }
+
+    public void setUsersLogo(UsersLogo usersLogo) {
+        this.usersLogo = usersLogo;
     }
 }

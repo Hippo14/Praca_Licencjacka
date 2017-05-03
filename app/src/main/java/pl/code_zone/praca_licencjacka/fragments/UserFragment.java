@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,8 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class UserFragment extends Fragment {
+
+    private static final String TAG = UserFragment.class.getSimpleName();
 
     private static final int IMAGE_REQUEST = 1;
     private static final int PIC_CROP = 2;
@@ -134,12 +137,12 @@ public class UserFragment extends Fragment {
         params.put("token", SessionManager.getToken());
         params.put("body", body);
 
-        Call<Map<String, User>> userCall = service.getUserByToken(params);
-        userCall.enqueue(new Callback<Map<String, User>>() {
+        Call<User> userCall = service.getUserByToken(params);
+        userCall.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<Map<String, User>> call, Response<Map<String, User>> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 if (response.body() != null) {
-                    User user = response.body().get("user");
+                    User user = response.body();
                     username.setText(user.getName());
                     email.setText(user.getEmail());
 
@@ -150,8 +153,8 @@ public class UserFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<Map<String, User>> call, Throwable t) {
-
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.e(TAG, t.toString());
             }
         });
     }

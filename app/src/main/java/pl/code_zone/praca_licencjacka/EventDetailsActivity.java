@@ -20,7 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pl.code_zone.praca_licencjacka.adapter.EventDetailsAdapter;
 import pl.code_zone.praca_licencjacka.model.Event;
+import pl.code_zone.praca_licencjacka.model.UsersEvents;
+import pl.code_zone.praca_licencjacka.row.EventDetailsRow;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
@@ -47,7 +50,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     Button mButton;
 
     ListView userList;
-    ArrayAdapter<String> adapter;
+    EventDetailsAdapter adapter;
 
     String context;
     Double latitude;
@@ -101,6 +104,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         EventService service = retrofit.create(EventService.class);
 
         Map<String, String> body = new HashMap<>();
+        body.put("latitude", Double.toString(latitude));
+        body.put("longitude", Double.toString(longitude));
 
         Map<String, Object> params = new HashMap<>();
         params.put("token", SessionManager.getToken());
@@ -111,11 +116,11 @@ public class EventDetailsActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()) {
-                    Snackbar.make(findViewById(R.id.activity_add_event), "Added to favourite!", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(R.id.activity_event_details), "Added to favourite!", Snackbar.LENGTH_LONG).show();
                 }
                 else {
                     try {
-                        Snackbar.make(findViewById(R.id.activity_add_event), response.errorBody().string(), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(findViewById(R.id.activity_event_details), response.errorBody().string(), Snackbar.LENGTH_LONG).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -124,7 +129,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Snackbar.make(findViewById(R.id.activity_add_event), t.toString(), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(findViewById(R.id.activity_event_details), t.toString(), Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -159,8 +164,6 @@ public class EventDetailsActivity extends AppCompatActivity {
                     markerDateCreated.setText(dt1.format(dateCreated));
                     markerDateEnd.setText(dt1.format(dateEnd));
                     markerCategory.setText(response.body().getCategory().getName());
-
-                    progressDialog.dismiss();
                 }
                 else {
                     progressDialog.dismiss();
@@ -191,27 +194,23 @@ public class EventDetailsActivity extends AppCompatActivity {
         params.put("token", SessionManager.getToken());
         params.put("body", body);
 
-        Call<Map<String, Map<String, String>>> eventCall = service.getUserListEvent(params);
-        eventCall.enqueue(new Callback<Map<String, Map<String, String>>>() {
+        Call<List<UsersEvents>> eventCall = service.getUserListEvent(params);
+        eventCall.enqueue(new Callback<List<UsersEvents>>() {
             @Override
-            public void onResponse(Call<Map<String, Map<String, String>>> call, Response<Map<String, Map<String, String>>> response) {
+            public void onResponse(Call<List<UsersEvents>> call, Response<List<UsersEvents>> response) {
                 if (response.isSuccessful()) {
-                    List<String> list = new ArrayList<>();
-
-                    // Add hashmap to list
-                    for (Map.Entry<String, Map<String, String>> elem : response.body().entrySet()) {
-                        Map<String, String> value = elem.getValue();
-                        list.add(value.get("user"));
+                    List<EventDetailsRow> eventDetailsRows = new ArrayList<>();
+                    for (UsersEvents elem : response.body()) {
+                        eventDetailsRows.add(new EventDetailsRow(elem));
                     }
-
-                    adapter = new ArrayAdapter<>(EventDetailsActivity.this, android.R.layout.simple_list_item_1, list);
+                    adapter = new EventDetailsAdapter(getApplicationContext(), eventDetailsRows);
                     userList.setAdapter(adapter);
                     progressDialog.dismiss();
                 }
             }
 
             @Override
-            public void onFailure(Call<Map<String, Map<String, String>>> call, Throwable t) {
+            public void onFailure(Call<List<UsersEvents>> call, Throwable t) {
                 progressDialog.dismiss();
             }
         });
