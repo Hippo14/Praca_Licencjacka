@@ -27,7 +27,7 @@ public interface EventService {
 
     @POST("events/get")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
-    Call<List<Event>> getEvents(@Body TokenEventCred eventCredentials);
+    Call<List<Event>> getEvents(@Body Map<String, Object> params);
 
     @POST("events/marker")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})

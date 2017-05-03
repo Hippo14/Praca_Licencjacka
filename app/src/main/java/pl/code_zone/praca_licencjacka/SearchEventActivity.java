@@ -6,10 +6,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
-import pl.code_zone.praca_licencjacka.utils.Config;
-import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.LocationUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
 import pl.code_zone.praca_licencjacka.webservice.EventService;
@@ -19,7 +18,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,9 +29,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -165,21 +165,21 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private void getEventsTask(String cityName, double latitude, double longitude) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("token", SessionManager.getToken());
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("cityName", cityName);
+        body.put("latitude", latitude);
+        body.put("longitude", longitude);
+        body.put("actualDate", new Date());
+
+        request.put("body", body);
 
         EventService service = retrofit.create(EventService.class);
-        TokenEventCred cred = new TokenEventCred();
-        EventCredentials eventCredentials = new EventCredentials();
-        eventCredentials.setCityName(cityName);
-        eventCredentials.setLatitude(latitude);
-        eventCredentials.setLongitude(longitude);
-        cred.setToken(SessionManager.getToken());
-        cred.setBody(eventCredentials);
-
-        Call<List<Event>> userCall = service.getEvents(cred);
+        Call<List<Event>> userCall = service.getEvents(request);
         userCall.enqueue(new Callback<List<Event>>() {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {

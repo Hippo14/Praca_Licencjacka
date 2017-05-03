@@ -42,6 +42,7 @@ import java.util.Locale;
 
 import okhttp3.ResponseBody;
 import pl.code_zone.praca_licencjacka.adapter.SpinnerAdapter;
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.Category;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.model.User;
@@ -164,10 +165,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     private void getCategories() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         CategoryService service = retrofit.create(CategoryService.class);
 
@@ -208,11 +206,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
 
 
     private void addEvent(Marker marker, EditText mDescription) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
-
+        Retrofit retrofit = ApiClient.getInstance().getClient();
         EventService service = retrofit.create(EventService.class);
         Event event = createEvent(marker, mDescription, beforeDate, afterDate, (Category)mEventCategories.getSelectedItem());
 

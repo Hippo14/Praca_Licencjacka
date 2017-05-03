@@ -17,6 +17,7 @@ import java.util.Map;
 import pl.code_zone.praca_licencjacka.EventDetailsActivity;
 import pl.code_zone.praca_licencjacka.R;
 import pl.code_zone.praca_licencjacka.adapter.EventAdapter;
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.row.BoardRow;
 import pl.code_zone.praca_licencjacka.row.EventRow;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
@@ -72,10 +73,7 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
     }
 
     public void eventTask() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         EventService service = retrofit.create(EventService.class);
 

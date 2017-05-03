@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pl.code_zone.praca_licencjacka.R;
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.User;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
@@ -124,11 +125,7 @@ public class UserFragment extends Fragment {
     }
 
     public void getUserTask() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
-
+        Retrofit retrofit = ApiClient.getInstance().getClient();
         UserService service = retrofit.create(UserService.class);
 
         Map<String, String> body = new HashMap<>();
@@ -160,10 +157,7 @@ public class UserFragment extends Fragment {
     }
 
     public void getUserLogo() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         UserService service = retrofit.create(UserService.class);
 
@@ -246,10 +240,7 @@ public class UserFragment extends Fragment {
     }
 
     public void setUserLogo(Bitmap userLogo) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         UserService service = retrofit.create(UserService.class);
 

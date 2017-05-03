@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import pl.code_zone.praca_licencjacka.adapter.EventDetailsAdapter;
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.model.UsersEvents;
 import pl.code_zone.praca_licencjacka.row.EventDetailsRow;
@@ -97,10 +98,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     private void addUserToEvent() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
         EventService service = retrofit.create(EventService.class);
 
         Map<String, String> body = new HashMap<>();
@@ -135,10 +133,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     public void getDetails(double latitude, double longitude) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         EventService service = retrofit.create(EventService.class);
         TokenEventCred cred = new TokenEventCred();
@@ -179,10 +174,7 @@ public class EventDetailsActivity extends AppCompatActivity {
     }
 
     public void getUserListFromEvent() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         EventService service = retrofit.create(EventService.class);
 

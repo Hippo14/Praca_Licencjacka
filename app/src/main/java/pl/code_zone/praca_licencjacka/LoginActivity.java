@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
@@ -227,10 +228,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void loginTask(String email, String password) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         UserService service = retrofit.create(UserService.class);
         EmailPassCred cred = new EmailPassCred();
