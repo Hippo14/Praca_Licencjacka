@@ -160,7 +160,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
 
     private void onAddEventClick() {
         Category selectedItem = (Category) mEventCategories.getSelectedItem();
-        if (beforeDate != null && afterDate != null && (!beforeDate.equals(afterDate) && beforeDate.before(afterDate)) && selectedItem.getId() != 999 && !" ".equals(selectedItem.getName()) &&
+        if (beforeDate != null && afterDate != null && (beforeDate.before(afterDate) || beforeDate.equals(afterDate)) && selectedItem.getId() != 999 && !" ".equals(selectedItem.getName()) &&
                 marker != null && marker.getTitle() != null && mDescription.getText() != null && beforeDate != null) {
                 addEvent(marker, mDescription);
         }
