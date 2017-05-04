@@ -312,7 +312,7 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(false);
-        mMap.getUiSettings().setMapToolbarEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setCompassEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
@@ -355,10 +355,12 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
                 if (response.isSuccessful()) {
                     if (response.body()) {
                         mButton.setText(getResources().getString(R.string.event_sign_out));
+
                     }
                     else {
                         mButton.setText(getResources().getString(R.string.event_sign_in));
                     }
+                    mMap.getUiSettings().setMapToolbarEnabled(response.body());
                 }
             }
 
