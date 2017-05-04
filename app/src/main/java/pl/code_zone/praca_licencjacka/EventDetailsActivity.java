@@ -48,6 +48,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     TextView markerDateEnd;
     TextView markerCategory;
 
+    TextView numberOfUsers;
+
     Button mButton;
 
     ListView userList;
@@ -69,6 +71,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         markerDateCreated = (TextView) findViewById(R.id.dateCreated);
         markerDateEnd = (TextView) findViewById(R.id.endDate);
         markerCategory = (TextView) findViewById(R.id.category);
+
+        numberOfUsers = (TextView) findViewById(R.id.number_of_users);
 
         userList = (ListView) findViewById(R.id.userList);
 
@@ -198,6 +202,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     adapter = new EventDetailsAdapter(getApplicationContext(), eventDetailsRows);
                     userList.setAdapter(adapter);
                     progressDialog.dismiss();
+                    numberOfUsers.setText(eventDetailsRows.size());
                 }
             }
 

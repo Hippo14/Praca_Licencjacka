@@ -88,8 +88,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/categoryHint"
-        android:layout_above="@+id/event_sign_in" />
+        android:layout_above="@+id/event_sign_in"
+        android:layout_below="@+id/category" />
 
     <TextView
         android:text="@string/hint_endDate"
@@ -156,5 +156,30 @@
         android:textStyle="bold"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="@string/user_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/endDate"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/user_list" />
+
+    <TextView
+        android:text="0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/user_list"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/number_of_users" />
+
+    <TextView
+        android:text="@string/user_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_count"
+        android:layout_alignBaseline="@+id/number_of_users"
+        android:layout_alignBottom="@+id/number_of_users"
+        android:layout_toStartOf="@+id/number_of_users" />
 
 </RelativeLayout>

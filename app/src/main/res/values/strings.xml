@@ -108,5 +108,8 @@
     <string name="hint_startDate">date created</string>
     <string name="hint_endDate">end date</string>
     <string name="hint_category">category</string>
+    <string name="user_list">User list</string>
+    <string name="user_count">Count:</string>
+    <string name="prompt_title">Event title</string>
 
 </resources>
