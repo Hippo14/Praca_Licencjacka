@@ -16,7 +16,7 @@ import retrofit2.http.POST;
 
 public interface CategoryService {
 
-    @GET("category/")
+    @POST("category/")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<List<Category>> getAll(@Body Token token);
 
