@@ -16,13 +16,13 @@ import java.util.Locale;
 
 public class LocationUtils {
 
-    public static String getCityName(LatLng latLng, Context context) {
-        String cityName = null;
+    public static Address getCityName(LatLng latLng, Context context) {
+        Address cityName = null;
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (addresses.size() > 0) {
-                cityName = addresses.get(0).getLocality();
+                cityName = addresses.get(0);
             }
         } catch (IOException e) {
             e.printStackTrace();

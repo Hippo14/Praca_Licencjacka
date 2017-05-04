@@ -58,7 +58,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true">
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true">
 
             <TextView
                 android:text="@string/hint_title"
@@ -89,7 +90,8 @@
                 android:textColor="@color/fontColor"
                 android:layout_marginLeft="3dp"
                 android:layout_above="@+id/usernameHint"
-                android:layout_toEndOf="@+id/titleHint" />
+                android:layout_toEndOf="@+id/titleHint"
+                android:text="asdasdasdsadasd" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -214,6 +216,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/user_list" />
+
+            <TextView
+                android:text="@string/hint_cityname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cityname_hint"
+                android:textColor="@color/half_black"
+                android:textSize="12sp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/cityName"
+                android:textColor="@color/fontColor"
+                android:layout_marginLeft="3dp"
+                android:layout_below="@+id/cityname_hint"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:id="@+id/address"
+                android:textColor="@color/fontColor"
+                android:layout_marginLeft="3dp"
+                android:layout_above="@+id/category"
+                android:layout_alignParentEnd="true" />
 
 
         </RelativeLayout>

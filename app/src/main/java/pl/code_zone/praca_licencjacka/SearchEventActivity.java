@@ -103,7 +103,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
         mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
-        cityName = LocationUtils.getCityName(location, getApplicationContext());
+        cityName = LocationUtils.getCityName(location, getApplicationContext()).getLocality();
 
         if (location != null) {
             CameraUpdate center = CameraUpdateFactory.newLatLngZoom(location, 12.0f);
@@ -157,7 +157,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private void getEvents(LatLng location) {
-        String cityName = LocationUtils.getCityName(location, getApplicationContext());
+        String cityName = LocationUtils.getCityName(location, getApplicationContext()).getLocality();
         double latitude = location.latitude;
         double longitude = location.longitude;
 

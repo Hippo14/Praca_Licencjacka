@@ -116,5 +116,6 @@
     <string name="email">Email</string>
     <string name="date_creation">Date creation</string>
     <string name="liked_events">Number of liked events</string>
+    <string name="hint_cityname">Address:</string>
 
 </resources>

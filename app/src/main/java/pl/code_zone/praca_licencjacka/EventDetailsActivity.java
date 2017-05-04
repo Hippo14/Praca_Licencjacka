@@ -3,6 +3,7 @@ package pl.code_zone.praca_licencjacka;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Address;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.model.UsersEvents;
 import pl.code_zone.praca_licencjacka.row.EventDetailsRow;
+import pl.code_zone.praca_licencjacka.utils.LocationUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
 import pl.code_zone.praca_licencjacka.webservice.EventService;
 import pl.code_zone.praca_licencjacka.webservice.credentials.EventCredentials;
@@ -47,6 +49,9 @@ import retrofit2.Retrofit;
 public class EventDetailsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final String TAG = EventDetailsActivity.class.getSimpleName();
+
+    TextView markerCityName;
+    TextView markerAddress;
 
     TextView markerTitle;
     TextView markerUsername;
@@ -69,6 +74,7 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
     GoogleMap mMap;
     FrameLayout mMapHolder;
     ImageView snapshotHolder;
+    String cityName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +84,8 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        markerCityName = (TextView) findViewById(R.id.cityName);
+        markerAddress = (TextView) findViewById(R.id.address);
         markerTitle = (TextView) findViewById(R.id.title);
         markerUsername = (TextView) findViewById(R.id.username);
         markerDescription = (TextView) findViewById(R.id.description);
@@ -113,7 +121,6 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         context = (String) getIntent().getExtras().get("context");
         latitude = Double.parseDouble((String) getIntent().getExtras().get("latitude"));
         longitude = Double.parseDouble((String) getIntent().getExtras().get("longitude"));
-
 
         progressDialog = new ProgressDialog(this);
         populate();
@@ -193,7 +200,7 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         });
     }
 
-    public void getDetails(double latitude, double longitude) {
+    public void getDetails(final double latitude, final double longitude) {
         Retrofit retrofit = ApiClient.getInstance().getClient();
 
         EventService service = retrofit.create(EventService.class);
@@ -220,6 +227,12 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
                     markerDateCreated.setText(dt1.format(dateCreated));
                     markerDateEnd.setText(dt1.format(dateEnd));
                     markerCategory.setText(response.body().getCategory().getName());
+
+
+                    Address address = LocationUtils.getCityName(new LatLng(latitude, longitude), getApplicationContext());
+                    markerCityName.setText(address.getLocality());
+                    markerAddress.setText(address.getAddressLine(0));
+
 
                     Byte isActive = response.body().getActive();
 
@@ -357,22 +370,22 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
     }
 
     private void reloadActivity() {
-        if (!"SearchEventActivity".equals(context)) {
-            Intent intent = getIntent();
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            finish();
-            startActivity(intent);
-        }
+        Intent intent = getIntent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        finish();
+        startActivity(intent);
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
 
-        Intent intent = new Intent(EventDetailsActivity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (!"SearchEventActivity".equals(context)) {
+            Intent intent = new Intent(EventDetailsActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        finish();
-        startActivity(intent);
+            finish();
+            startActivity(intent);
+        }
     }
 }
