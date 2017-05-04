@@ -96,7 +96,14 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addUserToEvent();
+                String text = mButton.getText().toString();
+                String deleted = getResources().getString(R.string.event_sign_in);
+
+                if (deleted.equals(text)) {
+                    addUserToEvent();
+                } else {
+                    deleteUserFromEvent();
+                }
             }
         });
 
@@ -106,21 +113,47 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         latitude = Double.parseDouble((String) getIntent().getExtras().get("latitude"));
         longitude = Double.parseDouble((String) getIntent().getExtras().get("longitude"));
 
-        initMap();
-
-        if ("EventFragment".equals(context)) {
-            mButton.setVisibility(View.GONE);
-        } else {
-            mButton.setVisibility(View.VISIBLE);
-        }
-
 
         progressDialog = new ProgressDialog(this);
         populate();
     }
 
-    private void initMap() {
+    private void deleteUserFromEvent() {
+        Retrofit retrofit = ApiClient.getInstance().getClient();
+        EventService service = retrofit.create(EventService.class);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("latitude", Double.toString(latitude));
+        body.put("longitude", Double.toString(longitude));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("token", SessionManager.getToken());
+        params.put("body", body);
+
+        Call<String> userCall = service.deleteUserFromEvent(params);
+        userCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Snackbar.make(findViewById(R.id.activity_event_details), "Deleted!", Snackbar.LENGTH_LONG).show();
+                    mButton.setText(getResources().getString(R.string.event_sign_in));
+                }
+                else {
+                    try {
+                        Snackbar.make(findViewById(R.id.activity_event_details), response.errorBody().string(), Snackbar.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Snackbar.make(findViewById(R.id.activity_event_details), t.toString(), Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
+
 
     private void addUserToEvent() {
         Retrofit retrofit = ApiClient.getInstance().getClient();
@@ -140,6 +173,7 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()) {
                     Snackbar.make(findViewById(R.id.activity_event_details), "Added to favourite!", Snackbar.LENGTH_LONG).show();
+                    mButton.setText(getResources().getString(R.string.event_sign_out));
                 }
                 else {
                     try {
@@ -179,11 +213,19 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
 
                     Date dateCreated = new Date(response.body().getDateCreation());
                     Date dateEnd = new Date(response.body().getDateEnding());
-                    SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
+                    SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                     markerDateCreated.setText(dt1.format(dateCreated));
                     markerDateEnd.setText(dt1.format(dateEnd));
                     markerCategory.setText(response.body().getCategory().getName());
+
+                    Byte isActive = response.body().getActive();
+
+                    if (isActive.intValue() == 1) {
+                        mButton.setVisibility(View.VISIBLE);
+                    } else {
+                        mButton.setVisibility(View.GONE);
+                    }
                 }
                 else {
                     progressDialog.dismiss();
@@ -244,6 +286,9 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         // Get event details
         getDetails(latitude, longitude);
 
+        // Check if user signed
+        getUserStatusEvent();
+
         // Get user list from event
         getUserListFromEvent();
     }
@@ -271,6 +316,40 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
                 MarkerOptions options = new MarkerOptions();
                 options.position(location);
                 mMap.addMarker(options);
+            }
+        });
+    }
+
+    public void getUserStatusEvent() {
+        Retrofit retrofit = ApiClient.getInstance().getClient();
+
+        EventService service = retrofit.create(EventService.class);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("latitude", Double.toString(latitude));
+        body.put("longitude", Double.toString(longitude));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("token", SessionManager.getToken());
+        params.put("body", body);
+
+        Call<Boolean> eventCall = service.getUserStatusEvent(params);
+        eventCall.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful()) {
+                    if (response.body()) {
+                        mButton.setText(getResources().getString(R.string.event_sign_out));
+                    }
+                    else {
+                        mButton.setText(getResources().getString(R.string.event_sign_in));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                progressDialog.dismiss();
             }
         });
     }
