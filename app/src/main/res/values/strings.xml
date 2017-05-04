@@ -111,5 +111,9 @@
     <string name="user_list">User list</string>
     <string name="user_count">Count:</string>
     <string name="prompt_title">Event title</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="date_creation">Date creation</string>
+    <string name="liked_events">Number of liked events</string>
 
 </resources>
