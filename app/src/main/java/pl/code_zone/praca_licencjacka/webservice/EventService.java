@@ -22,35 +22,27 @@ import retrofit2.http.POST;
 
 public interface EventService {
 
-    @POST("events/")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @POST("events/register")
     Call<String> addNewEvent(@Body Token event);
 
     @POST("events/")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<List<Event>> getEvents(@Body Map<String, Object> params);
 
     @POST("events/marker")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Marker> getMarkerDetails(@Body TokenEventCred cred);
 
     @POST("events/details")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Event> getEventDetails(@Body TokenEventCred cred);
 
     @POST("events/board")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Map<String, Map<String, String>>> getBoard(@Body Map<String, Object> params);
 
     @POST("events/user")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Map<String,Map<String,String>>> getEventsByUser(@Body Map<String, Object> params);
 
     @POST("events/list/user")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<List<UsersEvents>> getUserListEvent(@Body Map<String, Object> params);
 
-    @POST("events/user")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @POST("events/user/register")
     Call<String> addUserToEvent(@Body Map<String, Object> params);
 }
