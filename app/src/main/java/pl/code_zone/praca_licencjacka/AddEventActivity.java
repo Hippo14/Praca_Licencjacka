@@ -63,6 +63,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     private GoogleMap mGoogleMap;
     private Marker marker;
 
+    private EditText mEventTitle;
     private EditText mLocation;
     private EditText mDescription;
 
@@ -101,6 +102,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         marker = null;
         mProgressDialog = new ProgressDialog(AddEventActivity.this);
         mAddEvent = (Button) findViewById(R.id.event_add);
+        mEventTitle = (EditText) findViewById(R.id.title);
         mLocation = (EditText) findViewById(R.id.location);
         mDescription = (EditText) findViewById(R.id.description);
         mFromDate = (EditText) findViewById(R.id.fromDate);
@@ -208,7 +210,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     private void addEvent(Marker marker, EditText mDescription) {
         Retrofit retrofit = ApiClient.getInstance().getClient();
         EventService service = retrofit.create(EventService.class);
-        Event event = createEvent(marker, mDescription, beforeDate, afterDate, (Category)mEventCategories.getSelectedItem());
+        Event event = createEvent(mEventTitle, marker, mDescription, beforeDate, afterDate, (Category)mEventCategories.getSelectedItem());
 
         String token = SessionManager.getToken();
 
@@ -242,9 +244,9 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         });
     }
 
-    private Event createEvent(Marker marker, EditText mDescription, Date dateCreation, Date dateEnding, Category category) {
+    private Event createEvent(EditText mEventTitle, Marker marker, EditText mDescription, Date dateCreation, Date dateEnding, Category category) {
         Event event = new Event();
-        event.setName(marker.getTitle());
+        event.setName(mEventTitle.getText().toString());
         event.setDescription(mDescription.getText().toString());
         event.setLongitude(marker.getPosition().longitude);
         event.setLatitude(marker.getPosition().latitude);
