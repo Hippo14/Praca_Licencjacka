@@ -30,6 +30,7 @@ import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.ImageConverter;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
+import pl.code_zone.praca_licencjacka.webservice.EventService;
 import pl.code_zone.praca_licencjacka.webservice.UserService;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,6 +57,7 @@ public class UserFragment extends Fragment {
     private TextView username;
     private TextView email;
     private TextView dateCreation;
+    private TextView likedEvents;
 
     private LruCache<String, Bitmap> memoryCache;
 
@@ -96,9 +98,10 @@ public class UserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user, container, false);
 
-        username = (TextView) view.findViewById(R.id.username);
-        email = (TextView) view.findViewById(R.id.email);
-        dateCreation = (TextView) view.findViewById(R.id.dateCreation);
+        username = (TextView) view.findViewById(R.id.username_text);
+        email = (TextView) view.findViewById(R.id.email_text);
+        dateCreation = (TextView) view.findViewById(R.id.dateCreation_text);
+        likedEvents = (TextView) view.findViewById(R.id.likedEvents_text);
 
         imageView = (ImageView) view.findViewById(R.id.imageView);
 
@@ -122,6 +125,7 @@ public class UserFragment extends Fragment {
     public void getUser() {
         getUserTask();
         loadBitmap("logo", imageView);
+        getNumberOfLikedEvents();
     }
 
     public void getUserTask() {
@@ -266,6 +270,32 @@ public class UserFragment extends Fragment {
             @Override
             public void onFailure(Call<Boolean> call, Throwable t) {
 
+            }
+        });
+    }
+
+    public void getNumberOfLikedEvents() {
+        Retrofit retrofit = ApiClient.getInstance().getClient();
+        EventService service = retrofit.create(EventService.class);
+
+        Map<String, String> body = new HashMap<>();
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("token", SessionManager.getToken());
+        params.put("body", body);
+
+        Call<Map<String, String>> call = service.getLikedEvents(params);
+        call.enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                if (response.body() != null) {
+                    likedEvents.setText(response.body().get("likedEvents"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                Log.e(TAG, t.toString());
             }
         });
     }

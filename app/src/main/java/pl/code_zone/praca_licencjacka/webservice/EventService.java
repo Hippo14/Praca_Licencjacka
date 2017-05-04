@@ -45,4 +45,7 @@ public interface EventService {
 
     @POST("events/user/register")
     Call<String> addUserToEvent(@Body Map<String, Object> params);
+
+    @POST("events/user/count")
+    Call<Map<String,String>> getLikedEvents(Map<String, Object> params);
 }
