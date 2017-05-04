@@ -202,7 +202,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     adapter = new EventDetailsAdapter(getApplicationContext(), eventDetailsRows);
                     userList.setAdapter(adapter);
                     progressDialog.dismiss();
-                    numberOfUsers.setText(eventDetailsRows.size());
+                    numberOfUsers.setText(Integer.toString(eventDetailsRows.size()));
                 }
             }
 
