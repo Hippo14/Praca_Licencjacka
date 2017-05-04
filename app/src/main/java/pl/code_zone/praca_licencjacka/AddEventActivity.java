@@ -387,6 +387,9 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             if ("From date".equals(title)) {
                 beforeDate = calendar.getTime();
             } else {
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
                 afterDate = calendar.getTime();
             }
         }
