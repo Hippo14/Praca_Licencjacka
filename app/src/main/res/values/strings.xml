@@ -101,12 +101,20 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="event_sign_in">Add to event</string>
+    <string name="event_sign_out">Remove from event</string>
     <string name="prompt_fromDate">Before</string>
     <string name="prompt_toDate">After</string>
     <string name="prompt_date">Date</string>
     <string name="prompt_category">Categories</string>
-    <string name="hint_startDate">date created</string>
-    <string name="hint_endDate">end date</string>
-    <string name="hint_category">category</string>
+    <string name="hint_startDate">date created:</string>
+    <string name="hint_endDate">end date:</string>
+    <string name="hint_category">category:</string>
+    <string name="user_list">User list</string>
+    <string name="user_count">Count:</string>
+    <string name="prompt_title">Event title</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="date_creation">Date creation</string>
+    <string name="liked_events">Number of liked events</string>
 
 </resources>

@@ -12,6 +12,7 @@ import pl.code_zone.praca_licencjacka.webservice.credentials.Token;
 import pl.code_zone.praca_licencjacka.webservice.credentials.TokenEventCred;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
@@ -21,35 +22,36 @@ import retrofit2.http.POST;
 
 public interface EventService {
 
-    @POST("events/add")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @POST("events/register")
     Call<String> addNewEvent(@Body Token event);
 
-    @POST("events/get")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @POST("events/")
     Call<List<Event>> getEvents(@Body Map<String, Object> params);
 
     @POST("events/marker")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Marker> getMarkerDetails(@Body TokenEventCred cred);
 
     @POST("events/details")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Event> getEventDetails(@Body TokenEventCred cred);
 
     @POST("events/board")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Map<String, Map<String, String>>> getBoard(@Body Map<String, Object> params);
 
-    @POST("events/getByUser")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @POST("events/user")
     Call<Map<String,Map<String,String>>> getEventsByUser(@Body Map<String, Object> params);
 
-    @POST("events/getUserListEvent")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @POST("events/list/user")
     Call<List<UsersEvents>> getUserListEvent(@Body Map<String, Object> params);
 
-    @POST("events/addToEvent")
-    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @POST("events/user/register")
     Call<String> addUserToEvent(@Body Map<String, Object> params);
+
+    @POST("events/user/count")
+    Call<Map<String,String>> getLikedEvents(@Body Map<String, Object> params);
+
+    @POST("events/user/remove")
+    Call<String> deleteUserFromEvent(Map<String, Object> params);
+
+    @POST("events/user/status")
+    Call<Boolean> getUserStatusEvent(Map<String, Object> params);
 }

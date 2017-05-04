@@ -140,7 +140,7 @@ public class SearchEventActivity extends FragmentActivity implements OnMapReadyC
     private void addMarkers(List<Event> body) {
         Log.d("EventService", "Adding markers to map");
 
-        //mMap.clear();
+        mMap.clear();
 
         for (Event event : body) {
             MarkerOptions options = new MarkerOptions();

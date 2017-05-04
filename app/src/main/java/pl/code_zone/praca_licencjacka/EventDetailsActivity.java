@@ -1,20 +1,29 @@
 package pl.code_zone.praca_licencjacka;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +34,6 @@ import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.model.UsersEvents;
 import pl.code_zone.praca_licencjacka.row.EventDetailsRow;
-import pl.code_zone.praca_licencjacka.utils.Config;
-import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
 import pl.code_zone.praca_licencjacka.webservice.EventService;
 import pl.code_zone.praca_licencjacka.webservice.credentials.EventCredentials;
@@ -35,9 +42,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class EventDetailsActivity extends AppCompatActivity {
+public class EventDetailsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final String TAG = EventDetailsActivity.class.getSimpleName();
 
@@ -48,6 +54,8 @@ public class EventDetailsActivity extends AppCompatActivity {
     TextView markerDateEnd;
     TextView markerCategory;
 
+    TextView numberOfUsers;
+
     Button mButton;
 
     ListView userList;
@@ -57,11 +65,17 @@ public class EventDetailsActivity extends AppCompatActivity {
     Double latitude;
     Double longitude;
     ProgressDialog progressDialog;
+    GoogleMap mMap;
+    FrameLayout mMapHolder;
+    ImageView snapshotHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         markerTitle = (TextView) findViewById(R.id.title);
         markerUsername = (TextView) findViewById(R.id.username);
@@ -69,6 +83,12 @@ public class EventDetailsActivity extends AppCompatActivity {
         markerDateCreated = (TextView) findViewById(R.id.dateCreated);
         markerDateEnd = (TextView) findViewById(R.id.endDate);
         markerCategory = (TextView) findViewById(R.id.category);
+//        snapshotHolder = (ImageView) findViewById(R.id.snapshot);
+
+
+//        mMapHolder = (FrameLayout) findViewById(R.id.frame_layout);
+
+        numberOfUsers = (TextView) findViewById(R.id.number_of_users);
 
         userList = (ListView) findViewById(R.id.userList);
 
@@ -76,7 +96,14 @@ public class EventDetailsActivity extends AppCompatActivity {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addUserToEvent();
+                String text = mButton.getText().toString();
+                String deleted = getResources().getString(R.string.event_sign_in);
+
+                if (deleted.equals(text)) {
+                    addUserToEvent();
+                } else {
+                    deleteUserFromEvent();
+                }
             }
         });
 
@@ -86,16 +113,47 @@ public class EventDetailsActivity extends AppCompatActivity {
         latitude = Double.parseDouble((String) getIntent().getExtras().get("latitude"));
         longitude = Double.parseDouble((String) getIntent().getExtras().get("longitude"));
 
-        if ("EventFragment".equals(context)) {
-            mButton.setVisibility(View.GONE);
-        } else {
-            mButton.setVisibility(View.VISIBLE);
-        }
-
 
         progressDialog = new ProgressDialog(this);
         populate();
     }
+
+    private void deleteUserFromEvent() {
+        Retrofit retrofit = ApiClient.getInstance().getClient();
+        EventService service = retrofit.create(EventService.class);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("latitude", Double.toString(latitude));
+        body.put("longitude", Double.toString(longitude));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("token", SessionManager.getToken());
+        params.put("body", body);
+
+        Call<String> userCall = service.deleteUserFromEvent(params);
+        userCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Snackbar.make(findViewById(R.id.activity_event_details), "Deleted!", Snackbar.LENGTH_LONG).show();
+                    mButton.setText(getResources().getString(R.string.event_sign_in));
+                }
+                else {
+                    try {
+                        Snackbar.make(findViewById(R.id.activity_event_details), response.errorBody().string(), Snackbar.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Snackbar.make(findViewById(R.id.activity_event_details), t.toString(), Snackbar.LENGTH_LONG).show();
+            }
+        });
+    }
+
 
     private void addUserToEvent() {
         Retrofit retrofit = ApiClient.getInstance().getClient();
@@ -115,6 +173,7 @@ public class EventDetailsActivity extends AppCompatActivity {
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()) {
                     Snackbar.make(findViewById(R.id.activity_event_details), "Added to favourite!", Snackbar.LENGTH_LONG).show();
+                    mButton.setText(getResources().getString(R.string.event_sign_out));
                 }
                 else {
                     try {
@@ -154,11 +213,19 @@ public class EventDetailsActivity extends AppCompatActivity {
 
                     Date dateCreated = new Date(response.body().getDateCreation());
                     Date dateEnd = new Date(response.body().getDateEnding());
-                    SimpleDateFormat dt1 = new SimpleDateFormat("dd-MM-yyyy");
+                    SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                     markerDateCreated.setText(dt1.format(dateCreated));
                     markerDateEnd.setText(dt1.format(dateEnd));
                     markerCategory.setText(response.body().getCategory().getName());
+
+                    Byte isActive = response.body().getActive();
+
+                    if (isActive.intValue() == 1) {
+                        mButton.setVisibility(View.VISIBLE);
+                    } else {
+                        mButton.setVisibility(View.GONE);
+                    }
                 }
                 else {
                     progressDialog.dismiss();
@@ -198,6 +265,7 @@ public class EventDetailsActivity extends AppCompatActivity {
                     adapter = new EventDetailsAdapter(getApplicationContext(), eventDetailsRows);
                     userList.setAdapter(adapter);
                     progressDialog.dismiss();
+                    numberOfUsers.setText(Integer.toString(eventDetailsRows.size()));
                 }
             }
 
@@ -218,7 +286,71 @@ public class EventDetailsActivity extends AppCompatActivity {
         // Get event details
         getDetails(latitude, longitude);
 
+        // Check if user signed
+        getUserStatusEvent();
+
         // Get user list from event
         getUserListFromEvent();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        final LatLng location = new LatLng(
+                Double.parseDouble((String) getIntent().getExtras().get("latitude")),
+                Double.parseDouble((String) getIntent().getExtras().get("longitude"))
+        );
+
+        CameraUpdate center = CameraUpdateFactory.newLatLngZoom(location, 15.0f);
+        mMap.animateCamera(center);
+
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                mMap.clear();
+                MarkerOptions options = new MarkerOptions();
+                options.position(location);
+                mMap.addMarker(options);
+            }
+        });
+    }
+
+    public void getUserStatusEvent() {
+        Retrofit retrofit = ApiClient.getInstance().getClient();
+
+        EventService service = retrofit.create(EventService.class);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("latitude", Double.toString(latitude));
+        body.put("longitude", Double.toString(longitude));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("token", SessionManager.getToken());
+        params.put("body", body);
+
+        Call<Boolean> eventCall = service.getUserStatusEvent(params);
+        eventCall.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                if (response.isSuccessful()) {
+                    if (response.body()) {
+                        mButton.setText(getResources().getString(R.string.event_sign_out));
+                    }
+                    else {
+                        mButton.setText(getResources().getString(R.string.event_sign_in));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                progressDialog.dismiss();
+            }
+        });
     }
 }

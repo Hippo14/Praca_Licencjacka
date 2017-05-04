@@ -44,7 +44,7 @@ public class BoardAdapter extends ArrayAdapter<BoardRow> {
         eventName.setText(boardRow.getEventName());
         username.setText(boardRow.getUsername());
         description.setText(boardRow.getDescription());
-        imageView.setImageBitmap(boardRow.getImage());
+        imageView.setImageBitmap(ImageConverter.getRoundedCornerBitmap(boardRow.getImage(), 100));
 
         return convertView;
     }
