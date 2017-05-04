@@ -1,20 +1,29 @@
 package pl.code_zone.praca_licencjacka;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,8 +34,6 @@ import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.Event;
 import pl.code_zone.praca_licencjacka.model.UsersEvents;
 import pl.code_zone.praca_licencjacka.row.EventDetailsRow;
-import pl.code_zone.praca_licencjacka.utils.Config;
-import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.SessionManager;
 import pl.code_zone.praca_licencjacka.webservice.EventService;
 import pl.code_zone.praca_licencjacka.webservice.credentials.EventCredentials;
@@ -35,9 +42,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
-public class EventDetailsActivity extends AppCompatActivity {
+public class EventDetailsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final String TAG = EventDetailsActivity.class.getSimpleName();
 
@@ -59,11 +65,17 @@ public class EventDetailsActivity extends AppCompatActivity {
     Double latitude;
     Double longitude;
     ProgressDialog progressDialog;
+    GoogleMap mMap;
+    FrameLayout mMapHolder;
+    ImageView snapshotHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         markerTitle = (TextView) findViewById(R.id.title);
         markerUsername = (TextView) findViewById(R.id.username);
@@ -71,6 +83,10 @@ public class EventDetailsActivity extends AppCompatActivity {
         markerDateCreated = (TextView) findViewById(R.id.dateCreated);
         markerDateEnd = (TextView) findViewById(R.id.endDate);
         markerCategory = (TextView) findViewById(R.id.category);
+//        snapshotHolder = (ImageView) findViewById(R.id.snapshot);
+
+
+//        mMapHolder = (FrameLayout) findViewById(R.id.frame_layout);
 
         numberOfUsers = (TextView) findViewById(R.id.number_of_users);
 
@@ -90,6 +106,8 @@ public class EventDetailsActivity extends AppCompatActivity {
         latitude = Double.parseDouble((String) getIntent().getExtras().get("latitude"));
         longitude = Double.parseDouble((String) getIntent().getExtras().get("longitude"));
 
+        initMap();
+
         if ("EventFragment".equals(context)) {
             mButton.setVisibility(View.GONE);
         } else {
@@ -99,6 +117,9 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(this);
         populate();
+    }
+
+    private void initMap() {
     }
 
     private void addUserToEvent() {
@@ -225,5 +246,32 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         // Get user list from event
         getUserListFromEvent();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        final LatLng location = new LatLng(
+                Double.parseDouble((String) getIntent().getExtras().get("latitude")),
+                Double.parseDouble((String) getIntent().getExtras().get("longitude"))
+        );
+
+        CameraUpdate center = CameraUpdateFactory.newLatLngZoom(location, 15.0f);
+        mMap.animateCamera(center);
+
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                mMap.clear();
+                MarkerOptions options = new MarkerOptions();
+                options.position(location);
+                mMap.addMarker(options);
+            }
+        });
     }
 }

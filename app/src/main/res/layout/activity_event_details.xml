@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,173 +14,232 @@
     android:background="@drawable/background_color"
     tools:context="pl.code_zone.praca_licencjacka.EventDetailsActivity">
 
-    <TextView
-        android:text="@string/hint_startDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/dateCreatedHint"
-        android:textColor="@color/half_black"
-        android:textSize="12sp"
-        android:layout_below="@+id/descriptionHint"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="@string/hint_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/titleHint"
-        android:textColor="@color/half_black"
-        android:textSize="16sp" />
-
-    <TextView
-        android:text="@string/hint_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/usernameHint"
-        android:textColor="@color/half_black"
-        android:textSize="12sp"
-        android:layout_below="@+id/titleHint"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="@string/hint_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/descriptionHint"
-        android:textColor="@color/half_black"
-        android:textSize="12sp"
-        android:layout_below="@+id/usernameHint"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" "
-        android:id="@+id/title"
-        android:textColor="@color/fontColor"
-        android:layout_alignBottom="@+id/titleHint"
-        android:layout_toEndOf="@+id/descriptionHint"
-        android:layout_marginLeft="3dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" "
-        android:id="@+id/username"
-        android:textColor="@color/fontColor"
-        android:layout_below="@+id/title"
-        android:layout_alignStart="@+id/title" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" "
-        android:id="@+id/description"
-        android:textColor="@color/fontColor"
-        android:layout_alignTop="@+id/descriptionHint"
-        android:layout_toEndOf="@+id/descriptionHint"
-        android:layout_marginLeft="3dp" />
-
-    <ListView
-        android:id="@+id/userList"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_above="@+id/event_sign_in"
-        android:layout_below="@+id/category" />
+        android:layout_weight="2.0"
+        android:orientation="vertical" >
 
-    <TextView
-        android:text="@string/hint_endDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/endDateHint"
-        android:textColor="@color/half_black"
-        android:textSize="12sp"
-        android:layout_below="@+id/dateCreatedHint"
-        android:layout_alignParentStart="true" />
+        <!--<ImageView-->
+            <!--app:srcCompat="@color/buttonBorder"-->
+            <!--android:id="@+id/snapshot"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" "
-        android:id="@+id/dateCreated"
-        android:textColor="@color/fontColor"
-        android:layout_marginLeft="3dp"
-        android:layout_alignBaseline="@+id/dateCreatedHint"
-        android:layout_alignBottom="@+id/dateCreatedHint"
-        android:layout_toEndOf="@+id/dateCreatedHint" />
+        <!--<FrameLayout-->
+            <!--android:id="@+id/frame_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" "
-        android:id="@+id/endDate"
-        android:textColor="@color/fontColor"
-        android:layout_marginLeft="3dp"
-        android:layout_alignBottom="@+id/endDateHint"
-        android:layout_toEndOf="@+id/endDateHint" />
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:map="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                map:cameraZoom="13"
+                map:mapType="normal"
+                map:liteMode="true"/>
 
-    <TextView
-        android:text="@string/hint_category"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/categoryHint"
-        android:textColor="@color/half_black"
-        android:textSize="12sp"
-        android:layout_below="@+id/endDateHint"
-        android:layout_alignParentStart="true" />
+        <!--</FrameLayout>-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text=" "
-        android:id="@+id/category"
-        android:textColor="@color/fontColor"
-        android:layout_marginLeft="3dp"
-        android:layout_below="@+id/endDate"
-        android:layout_toEndOf="@+id/endDateHint" />
 
-    <Button
-        android:id="@+id/event_sign_in"
-        style="@android:style/TextAppearance.Material.Small"
+    </LinearLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/event_sign_in"
-        android:layout_weight="6.47"
-        android:background="@drawable/button_border"
-        android:textStyle="bold"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:layout_weight="1.0">
 
-    <TextView
-        android:text="@string/user_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/endDate"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/user_list" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <TextView
-        android:text="0"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/user_list"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/number_of_users" />
+            <TextView
+                android:text="@string/hint_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/titleHint"
+                android:textColor="@color/half_black"
+                android:textSize="16sp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
 
-    <TextView
-        android:text="@string/user_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/user_count"
-        android:layout_alignBaseline="@+id/number_of_users"
-        android:layout_alignBottom="@+id/number_of_users"
-        android:layout_toStartOf="@+id/number_of_users" />
 
-</RelativeLayout>
+            <TextView
+                android:text="@string/hint_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/usernameHint"
+                android:textColor="@color/half_black"
+                android:textSize="12sp"
+                android:layout_below="@+id/titleHint"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="eventTitle"
+                android:id="@+id/title"
+                android:textColor="@color/fontColor"
+                android:layout_marginLeft="3dp"
+                android:layout_above="@+id/usernameHint"
+                android:layout_toEndOf="@+id/titleHint" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="username"
+                android:id="@+id/username"
+                android:textColor="@color/fontColor"
+                android:layout_alignBaseline="@+id/usernameHint"
+                android:layout_alignBottom="@+id/usernameHint"
+                android:layout_toEndOf="@+id/usernameHint"
+                android:layout_marginLeft="3dp" />
+
+            <TextView
+                android:text="@string/hint_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/descriptionHint"
+                android:textColor="@color/half_black"
+                android:textSize="12sp"
+                android:layout_below="@+id/usernameHint"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="description"
+                android:id="@+id/description"
+                android:textColor="@color/fontColor"
+                android:layout_marginLeft="3dp"
+                android:layout_alignBottom="@+id/descriptionHint"
+                android:layout_toEndOf="@+id/descriptionHint" />
+
+            <TextView
+                android:text="@string/hint_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/categoryHint"
+                android:textColor="@color/half_black"
+                android:textSize="12sp"
+                android:layout_below="@+id/descriptionHint"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="category"
+                android:id="@+id/category"
+                android:textColor="@color/fontColor"
+                android:layout_marginLeft="3dp"
+                android:layout_alignBottom="@+id/categoryHint"
+                android:layout_toEndOf="@+id/categoryHint" />
+
+            <TextView
+                android:text="@string/hint_startDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/dateCreatedHint"
+                android:textColor="@color/half_black"
+                android:textSize="12sp"
+                android:layout_below="@+id/categoryHint"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="date created"
+                android:id="@+id/dateCreated"
+                android:textColor="@color/fontColor"
+                android:layout_marginLeft="3dp"
+                android:layout_alignBaseline="@+id/dateCreatedHint"
+                android:layout_alignBottom="@+id/dateCreatedHint"
+                android:layout_toEndOf="@+id/dateCreatedHint" />
+
+            <TextView
+                android:text="@string/hint_endDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/endDateHint"
+                android:textColor="@color/half_black"
+                android:textSize="12sp"
+                android:layout_below="@+id/dateCreatedHint"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="end date"
+                android:id="@+id/endDate"
+                android:textColor="@color/fontColor"
+                android:layout_marginLeft="3dp"
+                android:layout_alignBottom="@+id/endDateHint"
+                android:layout_toEndOf="@+id/endDateHint" />
+
+            <TextView
+                android:text="@string/user_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/endDate"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/user_list" />
+
+            <TextView
+                android:text="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/user_list"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/number_of_users" />
+
+            <TextView
+                android:text="@string/user_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/user_count"
+                android:layout_alignBaseline="@+id/number_of_users"
+                android:layout_alignBottom="@+id/number_of_users"
+                android:layout_toStartOf="@+id/number_of_users" />
+
+            <ListView
+                android:id="@+id/userList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/user_list" />
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2.5"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/event_sign_in"
+            style="@android:style/TextAppearance.Material.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/event_sign_in"
+            android:background="@drawable/button_border"
+            android:layout_below="@+id/userList"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>
