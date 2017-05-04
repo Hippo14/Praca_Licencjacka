@@ -6,6 +6,7 @@ import pl.code_zone.praca_licencjacka.model.Category;
 import pl.code_zone.praca_licencjacka.webservice.credentials.Token;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
@@ -15,7 +16,7 @@ import retrofit2.http.POST;
 
 public interface CategoryService {
 
-    @POST("category/")
+    @GET("category/")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<List<Category>> getAll(@Body Token token);
 

@@ -17,23 +17,23 @@ import retrofit2.http.Path;
 
 public interface UserService {
 
-    @POST("user/login")
+    @GET("user/")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<String> getUserByEmailAndPassword(@Body EmailPassCred emailPassCred);
 
-    @POST("user/register")
+    @POST("user/")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<String> registerNewUser(@Body User user);
 
-    @POST("user/getUserByToken")
+    @GET("user/token")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<User> getUserByToken(@Body Map<String, Object> params);
 
-    @POST("user/getUserLogo")
+    @GET("user/logo")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Map<String, String>> getUserLogo(@Body Map<String, Object> params);
 
-    @POST("user/setUserLogo")
+    @POST("user/logo")
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     Call<Boolean> setUserLogo(@Body Map<String, Object> params);
 }
