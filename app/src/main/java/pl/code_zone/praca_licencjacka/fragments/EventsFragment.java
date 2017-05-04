@@ -17,6 +17,7 @@ import java.util.Map;
 import pl.code_zone.praca_licencjacka.EventDetailsActivity;
 import pl.code_zone.praca_licencjacka.R;
 import pl.code_zone.praca_licencjacka.adapter.EventAdapter;
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.row.BoardRow;
 import pl.code_zone.praca_licencjacka.row.EventRow;
 import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
@@ -72,10 +73,7 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
     }
 
     public void eventTask() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         EventService service = retrofit.create(EventService.class);
 
@@ -89,18 +87,20 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
         boardCall.enqueue(new Callback<Map<String, Map<String, String>>>() {
             @Override
             public void onResponse(Call<Map<String, Map<String, String>>> call, Response<Map<String, Map<String, String>>> response) {
-                // Add hashmap to list
-                for (Map.Entry<String, Map<String, String>> elem : response.body().entrySet()) {
-                    String key = elem.getKey();
-                    Map<String, String> value = elem.getValue();
+                if (response.body() != null) {
+                    // Add hashmap to list
+                    for (Map.Entry<String, Map<String, String>> elem : response.body().entrySet()) {
+                        String key = elem.getKey();
+                        Map<String, String> value = elem.getValue();
 
-                    list.add(new EventRow(value.get("name"), value.get("description"), value.get("latitude"), value.get("longitude")));
+                        list.add(new EventRow(value.get("name"), value.get("description"), value.get("latitude"), value.get("longitude")));
+                    }
+
+                    // Refresh list
+                    eventAdapter.notifyDataSetChanged();
+
+                    Log.d(TAG, String.valueOf(response.body()));
                 }
-
-                // Refresh list
-                eventAdapter.notifyDataSetChanged();
-
-                Log.d(TAG, String.valueOf(response.body()));
             }
 
             @Override
@@ -114,6 +114,7 @@ public class EventsFragment extends Fragment implements AdapterView.OnItemClickL
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         EventRow eventRow = list.get(position);
         HashMap<String, String> params = new HashMap<>();
+        params.put("context", "EventFragment");
         params.put("latitude", eventRow.getLatitude());
         params.put("longitude", eventRow.getLongitude());
         ActivityUtils.change(getContext(), EventDetailsActivity.class, params);

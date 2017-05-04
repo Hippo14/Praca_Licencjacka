@@ -38,6 +38,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 
 import java.util.List;
 
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.fragments.BoardFragment;
 import pl.code_zone.praca_licencjacka.fragments.EventsFragment;
 import pl.code_zone.praca_licencjacka.fragments.UserFragment;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // TabLayout

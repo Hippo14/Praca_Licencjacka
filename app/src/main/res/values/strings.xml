@@ -101,5 +101,12 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="event_sign_in">Add to event</string>
+    <string name="prompt_fromDate">Before</string>
+    <string name="prompt_toDate">After</string>
+    <string name="prompt_date">Date</string>
+    <string name="prompt_category">Categories</string>
+    <string name="hint_startDate">date created</string>
+    <string name="hint_endDate">end date</string>
+    <string name="hint_category">category</string>
 
 </resources>

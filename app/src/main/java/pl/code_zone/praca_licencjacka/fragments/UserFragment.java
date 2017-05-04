@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pl.code_zone.praca_licencjacka.R;
+import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.model.User;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
@@ -42,6 +44,8 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class UserFragment extends Fragment {
+
+    private static final String TAG = UserFragment.class.getSimpleName();
 
     private static final int IMAGE_REQUEST = 1;
     private static final int PIC_CROP = 2;
@@ -121,11 +125,7 @@ public class UserFragment extends Fragment {
     }
 
     public void getUserTask() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
-
+        Retrofit retrofit = ApiClient.getInstance().getClient();
         UserService service = retrofit.create(UserService.class);
 
         Map<String, String> body = new HashMap<>();
@@ -134,31 +134,30 @@ public class UserFragment extends Fragment {
         params.put("token", SessionManager.getToken());
         params.put("body", body);
 
-        Call<Map<String, User>> userCall = service.getUserByToken(params);
-        userCall.enqueue(new Callback<Map<String, User>>() {
+        Call<User> userCall = service.getUserByToken(params);
+        userCall.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<Map<String, User>> call, Response<Map<String, User>> response) {
-                User user = response.body().get("user");
-                username.setText(user.getName());
-                email.setText(user.getEmail());
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.body() != null) {
+                    User user = response.body();
+                    username.setText(user.getName());
+                    email.setText(user.getEmail());
 
-                Date date = new Date(user.getDateCreation());
-                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                dateCreation.setText(dateFormat.format(date));
+                    Date date = new Date(user.getDateCreation());
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    dateCreation.setText(dateFormat.format(date));
+                }
             }
 
             @Override
-            public void onFailure(Call<Map<String, User>> call, Throwable t) {
-
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.e(TAG, t.toString());
             }
         });
     }
 
     public void getUserLogo() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         UserService service = retrofit.create(UserService.class);
 
@@ -172,12 +171,14 @@ public class UserFragment extends Fragment {
         userCall.enqueue(new Callback<Map<String, String>>() {
             @Override
             public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
-                String imageBase64 = response.body().get("image");
+                if (response.body() != null) {
+                    String imageBase64 = response.body().get("image");
 
-                byte[] decodedString = Base64.decode(imageBase64, Base64.NO_WRAP);
-                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                imageView.setImageBitmap(ImageConverter.getRoundedCornerBitmap(decodedByte, 100));
-                addBitmapToMemoryCache("logo", decodedByte);
+                    byte[] decodedString = Base64.decode(imageBase64, Base64.NO_WRAP);
+                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    imageView.setImageBitmap(ImageConverter.getRoundedCornerBitmap(decodedByte, 100));
+                    addBitmapToMemoryCache("logo", decodedByte);
+                }
             }
 
             @Override
@@ -239,10 +240,7 @@ public class UserFragment extends Fragment {
     }
 
     public void setUserLogo(Bitmap userLogo) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(Config.URL_WEBSERVICE)
-                .addConverterFactory(GsonConverterFactory.create(GsonUtils.create()))
-                .build();
+        Retrofit retrofit = ApiClient.getInstance().getClient();
 
         UserService service = retrofit.create(UserService.class);
 
