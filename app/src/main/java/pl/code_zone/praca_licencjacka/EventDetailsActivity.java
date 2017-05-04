@@ -1,6 +1,7 @@
 package pl.code_zone.praca_licencjacka;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
@@ -130,13 +131,14 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         params.put("token", SessionManager.getToken());
         params.put("body", body);
 
-        Call<String> userCall = service.deleteUserFromEvent(params);
-        userCall.enqueue(new Callback<String>() {
+        Call<Map<String, String>> userCall = service.deleteUserFromEvent(params);
+        userCall.enqueue(new Callback<Map<String, String>>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
                 if (response.isSuccessful()) {
-                    Snackbar.make(findViewById(R.id.activity_event_details), "Deleted!", Snackbar.LENGTH_LONG).show();
+                    //Snackbar.make(findViewById(R.id.activity_event_details), "Deleted!", Snackbar.LENGTH_LONG).show();
                     mButton.setText(getResources().getString(R.string.event_sign_in));
+                    reloadActivity();
                 }
                 else {
                     try {
@@ -148,12 +150,11 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
                 Snackbar.make(findViewById(R.id.activity_event_details), t.toString(), Snackbar.LENGTH_LONG).show();
             }
         });
     }
-
 
     private void addUserToEvent() {
         Retrofit retrofit = ApiClient.getInstance().getClient();
@@ -167,13 +168,14 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
         params.put("token", SessionManager.getToken());
         params.put("body", body);
 
-        Call<String> userCall = service.addUserToEvent(params);
-        userCall.enqueue(new Callback<String>() {
+        Call<Map<String, String>> userCall = service.addUserToEvent(params);
+        userCall.enqueue(new Callback<Map<String, String>>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
                 if (response.isSuccessful()) {
-                    Snackbar.make(findViewById(R.id.activity_event_details), "Added to favourite!", Snackbar.LENGTH_LONG).show();
+                    //Snackbar.make(findViewById(R.id.activity_event_details), "Added to favourite!", Snackbar.LENGTH_LONG).show();
                     mButton.setText(getResources().getString(R.string.event_sign_out));
+                    reloadActivity();
                 }
                 else {
                     try {
@@ -185,7 +187,7 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
                 Snackbar.make(findViewById(R.id.activity_event_details), t.toString(), Snackbar.LENGTH_LONG).show();
             }
         });
@@ -352,5 +354,25 @@ public class EventDetailsActivity extends FragmentActivity implements OnMapReady
                 progressDialog.dismiss();
             }
         });
+    }
+
+    private void reloadActivity() {
+        if (!"SearchEventActivity".equals(context)) {
+            Intent intent = getIntent();
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            finish();
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent intent = new Intent(EventDetailsActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        finish();
+        startActivity(intent);
     }
 }

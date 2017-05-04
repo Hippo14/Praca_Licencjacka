@@ -32,7 +32,6 @@
         android:layout_centerHorizontal="true" />
 
     <TextView
-        android:text="Username"
         android:textSize="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,7 +51,6 @@
         android:layout_marginTop="40dp" />
 
     <TextView
-        android:text="Email@email.pl"
         android:textSize="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -71,7 +69,6 @@
         android:layout_centerHorizontal="true" />
 
     <TextView
-        android:text="2017.05.04"
         android:textSize="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

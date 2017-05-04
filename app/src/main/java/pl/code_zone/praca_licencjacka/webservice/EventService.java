@@ -44,14 +44,14 @@ public interface EventService {
     Call<List<UsersEvents>> getUserListEvent(@Body Map<String, Object> params);
 
     @POST("events/user/register")
-    Call<String> addUserToEvent(@Body Map<String, Object> params);
+    Call<Map<String, String>> addUserToEvent(@Body Map<String, Object> params);
 
     @POST("events/user/count")
     Call<Map<String,String>> getLikedEvents(@Body Map<String, Object> params);
 
     @POST("events/user/remove")
-    Call<String> deleteUserFromEvent(Map<String, Object> params);
+    Call<Map<String, String>> deleteUserFromEvent(@Body Map<String, Object> params);
 
     @POST("events/user/status")
-    Call<Boolean> getUserStatusEvent(Map<String, Object> params);
+    Call<Boolean> getUserStatusEvent(@Body Map<String, Object> params);
 }
