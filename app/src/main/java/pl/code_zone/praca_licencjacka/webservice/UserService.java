@@ -26,9 +26,9 @@ public interface UserService {
     @POST("user/token")
     Call<User> getUserByToken(@Body Map<String, Object> params);
 
-    @POST("user/logo")
+    @POST("user/logo/get")
     Call<Map<String, String>> getUserLogo(@Body Map<String, Object> params);
 
-    @POST("user/logo")
+    @POST("user/logo/set")
     Call<Boolean> setUserLogo(@Body Map<String, Object> params);
 }
