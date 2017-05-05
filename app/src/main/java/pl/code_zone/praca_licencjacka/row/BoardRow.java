@@ -2,6 +2,7 @@ package pl.code_zone.praca_licencjacka.row;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.renderscript.Double2;
 import android.util.Base64;
 
 /**
@@ -10,6 +11,8 @@ import android.util.Base64;
 
 public class BoardRow {
 
+    private final double latitude;
+    private final double longitude;
     private String eventName;
     private String username;
     private String description;
@@ -24,12 +27,14 @@ public class BoardRow {
 
     private Bitmap image;
 
-    public BoardRow (String eventName, String username, String description, String imageBase64) {
+    public BoardRow(String eventName, String username, String description, String imageBase64, String latitude, String longitude) {
         this.eventName = eventName;
         this.username = username;
         this.description = description;
         byte[] decodedString = Base64.decode(imageBase64, Base64.NO_WRAP);
         this.image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        this.latitude = Double.parseDouble(latitude);
+        this.longitude = Double.parseDouble(longitude);
     }
 
     public String getEventName() {
@@ -54,5 +59,13 @@ public class BoardRow {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 }

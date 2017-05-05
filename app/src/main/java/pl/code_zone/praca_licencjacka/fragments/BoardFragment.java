@@ -18,12 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pl.code_zone.praca_licencjacka.EventDetailsActivity;
 import pl.code_zone.praca_licencjacka.LoginActivity;
 import pl.code_zone.praca_licencjacka.MainActivity;
 import pl.code_zone.praca_licencjacka.R;
 import pl.code_zone.praca_licencjacka.adapter.BoardAdapter;
 import pl.code_zone.praca_licencjacka.config.ApiClient;
 import pl.code_zone.praca_licencjacka.row.BoardRow;
+import pl.code_zone.praca_licencjacka.utils.ActivityUtils;
 import pl.code_zone.praca_licencjacka.utils.Config;
 import pl.code_zone.praca_licencjacka.utils.GsonUtils;
 import pl.code_zone.praca_licencjacka.utils.RsaUtils;
@@ -78,7 +80,13 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        BoardRow boardRow = list.get(position);
 
+        HashMap<String, String> params = new HashMap<>();
+        params.put("latitude", Double.toString(boardRow.getLatitude()));
+        params.put("longitude", Double.toString(boardRow.getLongitude()));
+        params.put("context", "SearchEventActivity");
+        ActivityUtils.change(this.getActivity(), EventDetailsActivity.class, params);
     }
 
     public void getBoardList() {
@@ -110,7 +118,7 @@ public class BoardFragment extends Fragment implements AdapterView.OnItemClickLi
                         String key = elem.getKey();
                         Map<String, String> value = elem.getValue();
 
-                        list.add(new BoardRow(value.get("name"), value.get("username"), value.get("description"), value.get("image")));
+                        list.add(new BoardRow(value.get("name"), value.get("username"), value.get("description"), value.get("image"), value.get("latitude"), value.get("longitude")));
                     }
 
                     // Refresh list
