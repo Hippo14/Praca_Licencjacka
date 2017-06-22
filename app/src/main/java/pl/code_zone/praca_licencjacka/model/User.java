@@ -26,8 +26,6 @@ public class User {
     long dateUpdated;
     @SerializedName("dateDeleted")
     long dateDeleted;
-    @SerializedName("userImage")
-    String userImage;
     @SerializedName("usersLogo")
     UsersLogo usersLogo;
 
@@ -93,14 +91,6 @@ public class User {
 
     public void setDateDeleted(long dateDeleted) {
         this.dateDeleted = dateDeleted;
-    }
-
-    public String getUserImage() {
-        return userImage;
-    }
-
-    public void setUserImage(String userImage) {
-        this.userImage = userImage;
     }
 
     public int getId() {

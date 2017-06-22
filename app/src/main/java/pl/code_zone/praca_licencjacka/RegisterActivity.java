@@ -278,7 +278,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderManager
         user.setDeleted(new Byte((byte) 0));
         user.setDateCreation(new Date().getTime());
         user.setDateDeleted(0);
-        user.setUserImage(null);
 
         return user;
     }
